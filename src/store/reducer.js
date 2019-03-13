@@ -1,5 +1,5 @@
 import { ERROR, ITEM_LOAD, PAGE_LOAD, REQUEST, SUCCESS } from 'store/actions';
-import { get } from 'lodash-es';
+import { find, get } from 'lodash-es';
 
 /**
  * @constant
@@ -9,8 +9,7 @@ export const initialState = {
   busy: false,
   count: 0,
   items: [],
-  page: 0,
-  perPage: 20,
+  perPage: 10,
 };
 
 /**
@@ -33,6 +32,10 @@ export default (state = initialState, action) => {
           return {
             ...state,
             busy: true,
+            items: state.items.map((obj) => ({
+              ...obj,
+              active: obj.id === get(action, 'payload.id'),
+            })),
           };
 
         case SUCCESS:
@@ -57,7 +60,8 @@ export default (state = initialState, action) => {
           return {
             ...state,
             busy: true,
-            page: get(action, 'payload.index'),
+            count: 0,
+            items: [],
           };
 
         case SUCCESS:
@@ -81,6 +85,14 @@ export default (state = initialState, action) => {
  * @constant
  * @function
  * @param {object} state
+ * @returns {?object}
+ */
+export const getActiveItem = (state) => find(get(state, 'items'), 'active');
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
  * @returns {object[]}
  */
 export const getItems = (state) => get(state, 'items');
@@ -89,9 +101,10 @@ export const getItems = (state) => get(state, 'items');
  * @constant
  * @function
  * @param {object} state
- * @returns {object[]}
+ * @returns {boolean}
  */
-export const getPage = (state) => get(state, 'page');
+export const getNumPages = (state) =>
+  Math.ceil(get(state, 'count') / get(state, 'perPage'));
 
 /**
  * @constant
@@ -105,23 +118,14 @@ export const getPerPage = (state) => get(state, 'perPage');
  * @constant
  * @function
  * @param {object} state
+ * @returns {?string}
+ */
+export const getTitle = (state) => get(getActiveItem(state), 'title');
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
  * @returns {boolean}
  */
 export const isBusy = (state) => get(state, 'busy');
-
-/**
- * @constant
- * @function
- * @param {object} state
- * @returns {boolean}
- */
-export const isFirstPage = (state) => get(state, 'page') === 0;
-
-/**
- * @constant
- * @function
- * @param {object} state
- * @returns {boolean}
- */
-export const isLastPage = (state) =>
-  (get(state, 'page') + 1) * get(state, 'perPage') > get(state, 'count');

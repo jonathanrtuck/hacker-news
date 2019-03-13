@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { drop, get, property, take } from 'lodash-es';
 import { flatMap, filter, map } from 'rxjs/operators';
-import { getPage, getPerPage } from 'store/reducer';
+import { getPerPage } from 'store/reducer';
 import { ofType } from 'redux-observable';
 import { PAGE_LOAD, REQUEST, SUCCESS } from 'store/actions';
 
@@ -60,7 +60,7 @@ export default (action$, state$) =>
   action$.pipe(
     ofType(PAGE_LOAD),
     filter((action) => get(action, 'meta.status') === REQUEST),
-    flatMap(() => {
+    flatMap((action) => {
       /**
        * @constant
        * @type {object}
@@ -70,7 +70,7 @@ export default (action$, state$) =>
        * @constant
        * @type {number}
        */
-      const page = getPage(state);
+      const page = get(action, 'payload.index');
       /**
        * @constant
        * @type {number}

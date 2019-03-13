@@ -28,7 +28,7 @@ export const SUCCESS = 'SUCCESS';
 /**
  * @constant
  * @function
- * @param {number|string} id
+ * @param {number} id
  * @returns {object}
  */
 export const loadItem = (id) => ({

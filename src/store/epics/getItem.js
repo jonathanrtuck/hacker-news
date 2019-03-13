@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { get, property } from 'lodash-es';
 import { flatMap, filter, map } from 'rxjs/operators';
+import { get, matchesProperty, property } from 'lodash-es';
+import { getItems } from 'store/reducer';
 import { ofType } from 'redux-observable';
 import { ITEM_LOAD, REQUEST, SUCCESS } from 'store/actions';
 
@@ -10,41 +11,51 @@ import { ITEM_LOAD, REQUEST, SUCCESS } from 'store/actions';
  * @see https://cors-anywhere.herokuapp.com/
  * @type {string}
  */
-const baseUrl =
+const url =
   'https://cors-anywhere.herokuapp.com/https://hacker-news.firebaseio.com/v0';
 
 /**
  * @constant
  * @function
  * @param {object} obj
- * @param {number} obj.first
- * @param {number} obj.offset
+ * @param {number[]} obj.kids
  * @returns {Promise}
  */
-const getItem = ({ id }) =>
-  axios({
-    method: 'get',
-    url: `${baseUrl}/item/${id}.json`,
-  })
-    .then(property('data'))
-    .then((item) => ({
-      item,
-    }));
+const getItem = ({ kids }) =>
+  axios.all(
+    kids.map((id) =>
+      axios({
+        method: 'get',
+        url: `${url}/item/${id}.json`,
+      }).then(property('data'))
+    )
+  );
 
 /**
  * @function
  * @param {Observable} action$
  * @returns {Observable}
  */
-export default (action$) =>
+export default (action$, state$) =>
   action$.pipe(
     ofType(ITEM_LOAD),
     filter((action) => get(action, 'meta.status') === REQUEST),
-    flatMap((action) =>
-      getItem({
-        id: get(action, 'payload.id'),
-      })
-    ),
+    flatMap((action) => {
+      /**
+       * @constant
+       * @type {object}
+       */
+      const state = state$.value;
+      /**
+       * @constant
+       * @type {object}
+       */
+      const items = getItems(state);
+
+      return getItem(
+        items.find(matchesProperty('id', get(action, 'payload.id')))
+      );
+    }),
     map((payload) => ({
       meta: {
         status: SUCCESS,

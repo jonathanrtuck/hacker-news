@@ -5,6 +5,7 @@ module.exports = {
   context: path.resolve('src'),
   devServer: {
     contentBase: path.resolve(__dirname, 'dist'),
+    historyApiFallback: true,
   },
   entry: 'index.jsx',
   module: {

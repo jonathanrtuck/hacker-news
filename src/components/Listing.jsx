@@ -2,18 +2,20 @@ import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { distanceInWordsToNow } from 'date-fns';
 import { fromUnixTime } from 'utils/time';
-import { getItems, getPage, isFirstPage, isLastPage } from 'store/reducer';
+import { getItems, getNumPages, isBusy } from 'store/reducer';
 import {
   Grow,
   IconButton,
+  LinearProgress,
   List,
   ListItem,
   ListItemText,
   withStyles,
 } from '@material-ui/core';
-import { loadItem, loadPage } from 'store/actions';
+import { Link } from 'react-router-dom';
+import { loadPage } from 'store/actions';
 import PropTypes from 'prop-types';
-import React, { Fragment } from 'react';
+import React, { Fragment, useEffect } from 'react';
 
 /**
  * @constant
@@ -39,51 +41,62 @@ const getSecondaryText = ({ by, score, time }) =>
  * @returns {ReactElement}
  */
 const Listing = (
-  { classes, isFirstPage, isLastPage, items, loadItem, loadPage, page } // eslint-disable-line no-shadow
-) => (
-  <Fragment>
-    <List>
-      {items.map(({ by, id, score, time, title }) => (
-        <Grow in key={id}>
-          <ListItem button component="li" onClick={() => loadItem(id)}>
-            <ListItemText
-              primary={title}
-              primaryTypographyProps={{
-                component: 'h2',
-              }}
-              secondary={getSecondaryText({
-                by,
-                score,
-                time,
-              })}
-            />
-          </ListItem>
-        </Grow>
-      ))}
-    </List>
-    <nav className={classes.nav}>
-      <IconButton
-        className={classes.arrow}
-        disabled={isFirstPage}
-        onClick={() => loadPage(page - 1)}
-      >
-        <ChevronLeft />
-      </IconButton>
-      <IconButton
-        className={classes.arrow}
-        disabled={isLastPage}
-        onClick={() => loadPage(page + 1)}
-      >
-        <ChevronRight />
-      </IconButton>
-    </nav>
-  </Fragment>
-);
+  { classes, isBusy, items, loadPage, numPages, page } // eslint-disable-line no-shadow
+) => {
+  useEffect(() => {
+    loadPage(page);
+  }, [page]);
+
+  return isBusy ? (
+    <LinearProgress />
+  ) : (
+    <Fragment>
+      <List>
+        {items.map(({ by, id, score, time, title }) => (
+          <Grow in key={id}>
+            <li>
+              <ListItem button component={Link} to={`/item/${id}`}>
+                <ListItemText
+                  primary={title}
+                  primaryTypographyProps={{
+                    component: 'h2',
+                  }}
+                  secondary={getSecondaryText({
+                    by,
+                    score,
+                    time,
+                  })}
+                />
+              </ListItem>
+            </li>
+          </Grow>
+        ))}
+      </List>
+      <nav className={classes.nav}>
+        <IconButton
+          className={classes.arrow}
+          component={Link}
+          disabled={page === 0}
+          to={`/${page === 1 ? '' : page - 1}`}
+        >
+          <ChevronLeft />
+        </IconButton>
+        <IconButton
+          className={classes.arrow}
+          component={Link}
+          disabled={page === numPages - 1}
+          to={`/${page + 1}`}
+        >
+          <ChevronRight />
+        </IconButton>
+      </nav>
+    </Fragment>
+  );
+};
 
 Listing.propTypes = {
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
-  isFirstPage: PropTypes.bool.isRequired,
-  isLastPage: PropTypes.bool.isRequired,
+  isBusy: PropTypes.bool.isRequired,
   items: PropTypes.arrayOf(
     PropTypes.shape({
       by: PropTypes.string.isRequired,
@@ -93,8 +106,8 @@ Listing.propTypes = {
       title: PropTypes.string.isRequired,
     })
   ).isRequired,
-  loadItem: PropTypes.func.isRequired,
   loadPage: PropTypes.func.isRequired,
+  numPages: PropTypes.number.isRequired,
   page: PropTypes.number.isRequired,
 };
 
@@ -103,13 +116,11 @@ Listing.propTypes = {
  */
 export default connect(
   (state) => ({
-    isFirstPage: isFirstPage(state),
-    isLastPage: isLastPage(state),
+    isBusy: isBusy(state),
     items: getItems(state),
-    page: getPage(state),
+    numPages: getNumPages(state),
   }),
   {
-    loadItem,
     loadPage,
   }
 )(
