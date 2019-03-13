@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
 import { get } from 'lodash-es';
+import Header from 'components/Header';
 import { isBusy } from 'store/reducer';
 import { LinearProgress, Typography } from '@material-ui/core';
 import Listing from 'components/Listing';
 import { loadPage } from 'store/actions';
 import PropTypes from 'prop-types';
-import React, { useEffect } from 'react';
+import React, { Fragment, useEffect } from 'react';
 
 /**
  * @constant
@@ -20,7 +21,12 @@ const App = (
     loadPage(0);
   }, []);
 
-  return isBusy ? <LinearProgress /> : <Listing />;
+  return (
+    <Fragment>
+      <Header />
+      {isBusy ? <LinearProgress /> : <Listing />}
+    </Fragment>
+  );
 };
 
 App.propTypes = {

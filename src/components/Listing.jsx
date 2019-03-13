@@ -43,9 +43,12 @@ const Listing = (
   <Fragment>
     <List>
       {items.map(({ by, id, score, time, title }) => (
-        <ListItem button key={id} onClick={() => loadItem(id)}>
+        <ListItem button component="li" key={id} onClick={() => loadItem(id)}>
           <ListItemText
             primary={title}
+            primaryTypographyProps={{
+              component: 'h2',
+            }}
             secondary={getSecondaryText({
               by,
               score,
