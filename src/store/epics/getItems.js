@@ -1,11 +1,14 @@
-import { PAGE_LOAD, REQUEST, SUCCESS } from 'store/actions';
 import axios from 'axios';
 import { drop, get, property, take } from 'lodash-es';
-import { flatMap, filter, map, tap } from 'rxjs/operators';
+import { flatMap, filter, map } from 'rxjs/operators';
+import { getPage, getPerPage } from 'store/reducer';
 import { ofType } from 'redux-observable';
+import { PAGE_LOAD, REQUEST, SUCCESS } from 'store/actions';
 
 /**
  * @constant
+ * @see https://github.com/HackerNews/API
+ * @see https://cors-anywhere.herokuapp.com/
  * @type {string}
  */
 const baseUrl =
@@ -19,13 +22,19 @@ const baseUrl =
  * @param {number} obj.offset
  * @returns {Promise}
  */
-const getItems = ({ first, offset }) =>
-  axios({
+const getItems = ({ first, offset }) => {
+  let count;
+
+  return axios({
     method: 'get',
     url: `${baseUrl}/topstories.json`,
   })
     .then(property('data'))
-    .then((ids) => take(drop(ids, offset), first))
+    .then((ids) => {
+      count = ids.length;
+
+      return take(drop(ids, offset), first);
+    })
     .then((ids) =>
       ids.map((id) =>
         axios({
@@ -35,35 +44,44 @@ const getItems = ({ first, offset }) =>
       )
     )
     .then(axios.all)
-    .then((responses) => responses.map(property('data')));
+    .then((responses) => ({
+      count,
+      items: responses.map(property('data')),
+    }));
+};
 
 /**
  * @constant
  * @function
  * @param {Observable}
  * @returns {Observable}
- * @see https://github.com/HackerNews/API
- * @see https://cors-anywhere.herokuapp.com/
  */
 export default (action$, state$) =>
   action$.pipe(
-    tap(console.debug),
-
     ofType(PAGE_LOAD),
     filter((action) => get(action, 'meta.status') === REQUEST),
-    flatMap(() =>
-      getItems({
-        first: get(state$, 'value.perPage'),
-        offset: get(state$, 'value.perPage') * get(state$, 'value.page'),
-      })
-    ),
-    map((arr) => ({
+    flatMap(() => {
+      /**
+       * @constant
+       * @type {number}
+       */
+      const page = getPage(state$.value);
+      /**
+       * @constant
+       * @type {number}
+       */
+      const perPage = getPerPage(state$.value);
+
+      return getItems({
+        first: perPage,
+        offset: page * perPage,
+      });
+    }),
+    map((payload) => ({
       meta: {
         status: SUCCESS,
       },
-      payload: {
-        items: arr,
-      },
+      payload,
       type: PAGE_LOAD,
     }))
   );

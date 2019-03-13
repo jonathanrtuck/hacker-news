@@ -1,6 +1,6 @@
 import { applyMiddleware, createStore } from 'redux';
 import { createEpicMiddleware } from 'redux-observable';
-import epic from 'store/epic';
+import epics from 'store/epics';
 import reducer from 'store/reducer';
 
 /**
@@ -14,6 +14,6 @@ const middleware = createEpicMiddleware();
  */
 const store = createStore(reducer, applyMiddleware(middleware));
 
-middleware.run(epic);
+middleware.run(epics);
 
 export default store;

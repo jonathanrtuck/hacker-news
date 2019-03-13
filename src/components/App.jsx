@@ -1,12 +1,11 @@
-import { AccessAlarm } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { get } from 'lodash-es';
-import { getItems, isBusy } from 'store/reducer';
-import { LinearProgress } from '@material-ui/core';
+import { isBusy } from 'store/reducer';
+import { LinearProgress, Typography } from '@material-ui/core';
+import Listing from 'components/Listing';
 import { loadPage } from 'store/actions';
 import PropTypes from 'prop-types';
-import React, { Component, useEffect } from 'react';
-import { Typography } from '@material-ui/core';
+import React, { useEffect } from 'react';
 
 /**
  * @constant
@@ -14,38 +13,18 @@ import { Typography } from '@material-ui/core';
  * @param {object} props
  * @returns {ReactElement}
  */
-const App = ({ isBusy, items, loadPage }) => {
+const App = (
+  { isBusy, items, loadPage } // eslint-disable-line no-shadow
+) => {
   useEffect(() => {
-    loadPage();
+    loadPage(0);
   }, []);
 
-  return isBusy ? (
-    <LinearProgress />
-  ) : (
-    <ul>
-      {items.map(({ by, id, score, time, title, url }) => (
-        <li key={id}>
-          <Typography component="a" href={url}>
-            {title}
-          </Typography>
-        </li>
-      ))}
-    </ul>
-  );
+  return isBusy ? <LinearProgress /> : <Listing />;
 };
 
 App.propTypes = {
   isBusy: PropTypes.bool.isRequired,
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      by: PropTypes.string.isRequired,
-      id: PropTypes.number.isRequired,
-      score: PropTypes.number.isRequired,
-      time: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      url: PropTypes.string,
-    })
-  ).isRequired,
   loadPage: PropTypes.func.isRequired,
 };
 
@@ -55,7 +34,6 @@ App.propTypes = {
 export default connect(
   (state) => ({
     isBusy: isBusy(state),
-    items: getItems(state),
   }),
   {
     loadPage,
