@@ -124,4 +124,4 @@ export const isFirstPage = (state) => get(state, 'page') === 0;
  * @returns {boolean}
  */
 export const isLastPage = (state) =>
-  get(state, 'count') <= (get(state, 'page') + 1) * get(state, 'perPage');
+  (get(state, 'page') + 1) * get(state, 'perPage') > get(state, 'count');

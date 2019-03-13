@@ -1,5 +1,7 @@
 # hacker-news
 
+A material design interface for the [Hacker News feed](https://news.ycombinator.com/news) using its [API](https://github.com/HackerNews/API), mainly just as an excuse to learn [_redux-observable_](https://redux-observable.js.org/) and [React Hooks](https://reactjs.org/docs/hooks-intro.html).
+
 ## Installation
 
 Requires [Node.js](https://nodejs.org/) v8+ and [yarn](https://yarnpkg.com/).
@@ -16,7 +18,7 @@ yarn
 yarn develop
 ```
 
-This will start a hot-reloading development environment accessible at [http://localhost:8080/](http://localhost:8080/).
+This will start a hot-reloading development environment accessible locally at [localhost:8080](http://localhost:8080/).
 
 ## Deployment
 

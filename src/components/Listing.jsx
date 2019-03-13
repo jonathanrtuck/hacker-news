@@ -4,6 +4,7 @@ import { distanceInWordsToNow } from 'date-fns';
 import { fromUnixTime } from 'utils/time';
 import { getItems, getPage, isFirstPage, isLastPage } from 'store/reducer';
 import {
+  Grow,
   IconButton,
   List,
   ListItem,
@@ -43,19 +44,21 @@ const Listing = (
   <Fragment>
     <List>
       {items.map(({ by, id, score, time, title }) => (
-        <ListItem button component="li" key={id} onClick={() => loadItem(id)}>
-          <ListItemText
-            primary={title}
-            primaryTypographyProps={{
-              component: 'h2',
-            }}
-            secondary={getSecondaryText({
-              by,
-              score,
-              time,
-            })}
-          />
-        </ListItem>
+        <Grow in key={id}>
+          <ListItem button component="li" onClick={() => loadItem(id)}>
+            <ListItemText
+              primary={title}
+              primaryTypographyProps={{
+                component: 'h2',
+              }}
+              secondary={getSecondaryText({
+                by,
+                score,
+                time,
+              })}
+            />
+          </ListItem>
+        </Grow>
       ))}
     </List>
     <nav className={classes.nav}>
