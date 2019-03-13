@@ -5,15 +5,13 @@ import reducer from 'store/reducer';
 
 /**
  * @constant
- * @type {MiddlewareAPI}
+ * @function
  */
 const middleware = createEpicMiddleware();
 
 /**
  * @type {object}
  */
-const store = createStore(reducer, applyMiddleware(middleware));
+export default createStore(reducer, applyMiddleware(middleware));
 
 middleware.run(epics);
-
-export default store;

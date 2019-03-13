@@ -1,9 +1,9 @@
 import { ignoreElements, tap } from 'rxjs/operators';
 
 /**
- * @constant
+ * log all actions for debugging during development.
  * @function
- * @param {Observable}
+ * @param {Observable} action$
  * @returns {Observable}
  */
 export default (action$) =>

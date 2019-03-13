@@ -32,9 +32,8 @@ const getItem = ({ id }) =>
     }));
 
 /**
- * @constant
  * @function
- * @param {Observable}
+ * @param {Observable} action$
  * @returns {Observable}
  */
 export default (action$) =>

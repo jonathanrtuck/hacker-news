@@ -11,7 +11,7 @@ import { PAGE_LOAD, REQUEST, SUCCESS } from 'store/actions';
  * @see https://cors-anywhere.herokuapp.com/
  * @type {string}
  */
-const baseUrl =
+const url =
   'https://cors-anywhere.herokuapp.com/https://hacker-news.firebaseio.com/v0';
 
 /**
@@ -27,7 +27,7 @@ const getItems = ({ first, offset }) => {
 
   return axios({
     method: 'get',
-    url: `${baseUrl}/topstories.json`,
+    url: `${url}/topstories.json`,
   })
     .then(property('data'))
     .then((ids) => {
@@ -39,7 +39,7 @@ const getItems = ({ first, offset }) => {
       ids.map((id) =>
         axios({
           method: 'get',
-          url: `${baseUrl}/item/${id}.json`,
+          url: `${url}/item/${id}.json`,
         })
       )
     )
@@ -51,9 +51,9 @@ const getItems = ({ first, offset }) => {
 };
 
 /**
- * @constant
  * @function
- * @param {Observable}
+ * @param {Observable} action$
+ * @param {Observable} state$
  * @returns {Observable}
  */
 export default (action$, state$) =>
@@ -63,14 +63,19 @@ export default (action$, state$) =>
     flatMap(() => {
       /**
        * @constant
-       * @type {number}
+       * @type {object}
        */
-      const page = getPage(state$.value);
+      const state = state$.value;
       /**
        * @constant
        * @type {number}
        */
-      const perPage = getPerPage(state$.value);
+      const page = getPage(state);
+      /**
+       * @constant
+       * @type {number}
+       */
+      const perPage = getPerPage(state);
 
       return getItems({
         first: perPage,
