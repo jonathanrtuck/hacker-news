@@ -1,5 +1,5 @@
-import { ERROR, ITEM_LOAD, PAGE_LOAD, REQUEST, SUCCESS } from 'store/actions';
-import { find, get } from 'lodash-es';
+import { REQUEST, STORIES_READ, STORY_READ, SUCCESS } from 'store/actions';
+import { filter, find, get, matchesProperty } from 'lodash-es';
 
 /**
  * @constant
@@ -20,42 +20,8 @@ export const initialState = {
  */
 export default (state = initialState, action) => {
   switch (get(action, 'type')) {
-    case ITEM_LOAD:
+    case STORIES_READ:
       switch (get(action, 'meta.status')) {
-        case ERROR:
-          return {
-            ...state,
-            busy: false,
-          };
-
-        case REQUEST:
-          return {
-            ...state,
-            busy: true,
-            items: state.items.map((obj) => ({
-              ...obj,
-              active: obj.id === get(action, 'payload.id'),
-            })),
-          };
-
-        case SUCCESS:
-          return {
-            ...state,
-            busy: false,
-          };
-
-        default:
-          return state;
-      }
-
-    case PAGE_LOAD:
-      switch (get(action, 'meta.status')) {
-        case ERROR:
-          return {
-            ...state,
-            busy: false,
-          };
-
         case REQUEST:
           return {
             ...state,
@@ -76,6 +42,28 @@ export default (state = initialState, action) => {
           return state;
       }
 
+    case STORY_READ:
+      switch (get(action, 'meta.status')) {
+        case REQUEST:
+          return {
+            ...state,
+            busy: true,
+            items: state.items.map((obj) => ({
+              ...obj,
+              active: obj.id === get(action, 'payload.id'),
+            })),
+          };
+
+        case SUCCESS:
+          return {
+            ...state,
+            busy: false,
+          };
+
+        default:
+          return state;
+      }
+
     default:
       return state;
   }
@@ -85,17 +73,25 @@ export default (state = initialState, action) => {
  * @constant
  * @function
  * @param {object} state
- * @returns {?object}
+ * @param {number} id
+ * @returns {string}
  */
-export const getActiveItem = (state) => find(get(state, 'items'), 'active');
+export const getBy = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'by');
 
 /**
  * @constant
  * @function
  * @param {object} state
+ * @param {number} id
  * @returns {object[]}
  */
-export const getItems = (state) => get(state, 'items');
+export const getComments = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'kids', []).map(
+    (commentId) => ({
+      id: commentId,
+    })
+  );
 
 /**
  * @constant
@@ -118,9 +114,50 @@ export const getPerPage = (state) => get(state, 'perPage');
  * @constant
  * @function
  * @param {object} state
- * @returns {?string}
+ * @param {number} id
+ * @returns {number}
  */
-export const getTitle = (state) => get(getActiveItem(state), 'title');
+export const getScore = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'score');
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
+ * @returns {object[]}
+ */
+export const getStories = (state) =>
+  filter(get(state, 'items'), matchesProperty('type', 'story'));
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
+ * @param {number} id
+ * @returns {number}
+ */
+export const getTime = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'time');
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
+ * @param {number} id
+ * @returns {string}
+ */
+export const getTitle = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'title');
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
+ * @param {number} id
+ * @returns {string}
+ */
+export const getUrl = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'url');
 
 /**
  * @constant

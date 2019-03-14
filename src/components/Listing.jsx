@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { distanceInWordsToNow } from 'date-fns';
 import { fromUnixTime } from 'utils/time';
-import { getItems, getNumPages, isBusy } from 'store/reducer';
+import { getStories, getNumPages, isBusy } from 'store/reducer';
 import {
   Grow,
   IconButton,
@@ -13,7 +13,7 @@ import {
   withStyles,
 } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import { loadPage } from 'store/actions';
+import { readStories } from 'store/actions';
 import PropTypes from 'prop-types';
 import React, { Fragment, useEffect } from 'react';
 
@@ -41,10 +41,10 @@ const getSecondaryText = ({ by, score, time }) =>
  * @returns {ReactElement}
  */
 const Listing = (
-  { classes, isBusy, items, loadPage, numPages, page } // eslint-disable-line no-shadow
+  { classes, isBusy, items, readStories, numPages, page } // eslint-disable-line no-shadow
 ) => {
   useEffect(() => {
-    loadPage(page);
+    readStories(page);
   }, [page]);
 
   return isBusy ? (
@@ -106,9 +106,9 @@ Listing.propTypes = {
       title: PropTypes.string.isRequired,
     })
   ).isRequired,
-  loadPage: PropTypes.func.isRequired,
   numPages: PropTypes.number.isRequired,
   page: PropTypes.number.isRequired,
+  readStories: PropTypes.func.isRequired,
 };
 
 /**
@@ -117,11 +117,11 @@ Listing.propTypes = {
 export default connect(
   (state) => ({
     isBusy: isBusy(state),
-    items: getItems(state),
+    items: getStories(state),
     numPages: getNumPages(state),
   }),
   {
-    loadPage,
+    readStories,
   }
 )(
   withStyles((theme) => ({

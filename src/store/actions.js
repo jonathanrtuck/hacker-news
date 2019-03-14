@@ -2,12 +2,12 @@
  * @constant
  * @type {string}
  */
-export const ITEM_LOAD = 'ITEM_LOAD';
+export const STORIES_READ = 'STORIES_READ';
 /**
  * @constant
  * @type {string}
  */
-export const PAGE_LOAD = 'PAGE_LOAD';
+export const STORY_READ = 'STORY_READ';
 
 /**
  * @constant
@@ -28,31 +28,31 @@ export const SUCCESS = 'SUCCESS';
 /**
  * @constant
  * @function
- * @param {number} id
- * @returns {object}
- */
-export const loadItem = (id) => ({
-  meta: {
-    status: REQUEST,
-  },
-  payload: {
-    id,
-  },
-  type: ITEM_LOAD,
-});
-
-/**
- * @constant
- * @function
  * @param {number} index
  * @returns {object}
  */
-export const loadPage = (index) => ({
+export const readStories = (index) => ({
   meta: {
     status: REQUEST,
   },
   payload: {
     index,
   },
-  type: PAGE_LOAD,
+  type: STORIES_READ,
+});
+
+/**
+ * @constant
+ * @function
+ * @param {number} id
+ * @returns {object}
+ */
+export const readStory = (id) => ({
+  meta: {
+    status: REQUEST,
+  },
+  payload: {
+    id,
+  },
+  type: STORY_READ,
 });

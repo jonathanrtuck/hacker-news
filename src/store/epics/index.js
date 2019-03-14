@@ -1,9 +1,9 @@
 import { combineEpics } from 'redux-observable';
 import debug from './debug';
-import getItem from './getItem';
-import getItems from './getItems';
+import stories from './stories';
+import story from './story';
 
 /**
  * @type {function}
  */
-export default combineEpics(debug, getItem, getItems);
+export default combineEpics(debug, stories, story);

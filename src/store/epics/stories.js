@@ -3,16 +3,14 @@ import { drop, get, property, take } from 'lodash-es';
 import { flatMap, filter, map } from 'rxjs/operators';
 import { getPerPage } from 'store/reducer';
 import { ofType } from 'redux-observable';
-import { PAGE_LOAD, REQUEST, SUCCESS } from 'store/actions';
+import { REQUEST, STORIES_READ, SUCCESS } from 'store/actions';
 
 /**
  * @constant
  * @see https://github.com/HackerNews/API
- * @see https://cors-anywhere.herokuapp.com/
  * @type {string}
  */
-const url =
-  'https://cors-anywhere.herokuapp.com/https://hacker-news.firebaseio.com/v0';
+const url = 'https://hacker-news.firebaseio.com/v0';
 
 /**
  * @constant
@@ -22,7 +20,7 @@ const url =
  * @param {number} obj.offset
  * @returns {Promise}
  */
-const getItems = ({ first, offset }) => {
+const getStories = ({ first, offset }) => {
   let count;
 
   return axios({
@@ -58,14 +56,9 @@ const getItems = ({ first, offset }) => {
  */
 export default (action$, state$) =>
   action$.pipe(
-    ofType(PAGE_LOAD),
+    ofType(STORIES_READ),
     filter((action) => get(action, 'meta.status') === REQUEST),
     flatMap((action) => {
-      /**
-       * @constant
-       * @type {object}
-       */
-      const state = state$.value;
       /**
        * @constant
        * @type {number}
@@ -75,9 +68,9 @@ export default (action$, state$) =>
        * @constant
        * @type {number}
        */
-      const perPage = getPerPage(state);
+      const perPage = getPerPage(state$.value);
 
-      return getItems({
+      return getStories({
         first: perPage,
         offset: page * perPage,
       });
@@ -87,6 +80,6 @@ export default (action$, state$) =>
         status: SUCCESS,
       },
       payload,
-      type: PAGE_LOAD,
+      type: STORIES_READ,
     }))
   );

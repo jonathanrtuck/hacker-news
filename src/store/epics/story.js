@@ -1,18 +1,16 @@
 import axios from 'axios';
 import { flatMap, filter, map } from 'rxjs/operators';
 import { get, matchesProperty, property } from 'lodash-es';
-import { getItems } from 'store/reducer';
+import { getStories } from 'store/reducer';
 import { ofType } from 'redux-observable';
-import { ITEM_LOAD, REQUEST, SUCCESS } from 'store/actions';
+import { REQUEST, STORY_READ, SUCCESS } from 'store/actions';
 
 /**
  * @constant
  * @see https://github.com/HackerNews/API
- * @see https://cors-anywhere.herokuapp.com/
  * @type {string}
  */
-const url =
-  'https://cors-anywhere.herokuapp.com/https://hacker-news.firebaseio.com/v0';
+const url = 'https://hacker-news.firebaseio.com/v0';
 
 /**
  * @constant
@@ -21,7 +19,7 @@ const url =
  * @param {number[]} obj.kids
  * @returns {Promise}
  */
-const getItem = ({ kids }) =>
+const getComments = ({ kids }) =>
   axios.all(
     kids.map((id) =>
       axios({
@@ -38,7 +36,7 @@ const getItem = ({ kids }) =>
  */
 export default (action$, state$) =>
   action$.pipe(
-    ofType(ITEM_LOAD),
+    ofType(STORY_READ),
     filter((action) => get(action, 'meta.status') === REQUEST),
     flatMap((action) => {
       /**
@@ -50,9 +48,9 @@ export default (action$, state$) =>
        * @constant
        * @type {object}
        */
-      const items = getItems(state);
+      const items = getStories(state);
 
-      return getItem(
+      return getComments(
         items.find(matchesProperty('id', get(action, 'payload.id')))
       );
     }),
@@ -61,6 +59,6 @@ export default (action$, state$) =>
         status: SUCCESS,
       },
       payload,
-      type: ITEM_LOAD,
+      type: STORY_READ,
     }))
   );

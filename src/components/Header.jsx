@@ -9,6 +9,7 @@ import { ArrowBack } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { get } from 'lodash-es';
 import { getTitle } from 'store/reducer';
+import { matchPath } from 'react-router';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Route, withRouter } from 'react-router-dom';
@@ -52,6 +53,11 @@ Header.propTypes = {
   lastLocation: PropTypes.shape({
     pathname: PropTypes.string,
   }),
+  match: PropTypes.shape({
+    params: PropTypes.shape({
+      id: PropTypes.string,
+    }).isRequired,
+  }).isRequired,
   title: PropTypes.string,
 };
 
@@ -67,9 +73,26 @@ Header.defaultProps = {
  */
 export default withRouter(
   withLastLocation(
-    connect((state) => ({
-      title: getTitle(state),
-    }))(
+    connect((state, { location }) => {
+      /**
+       * @constant
+       * @type {?number}
+       */
+      const id = parseInt(
+        get(
+          matchPath(get(location, 'pathname'), {
+            path: '/item/:id',
+            exact: true,
+          }),
+          'params.id'
+        ),
+        10
+      );
+
+      return {
+        title: id ? getTitle(state, id) : undefined,
+      };
+    })(
       withStyles((theme) => ({
         arrow: {
           marginRight: theme.spacing.unit,
