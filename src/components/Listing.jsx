@@ -1,7 +1,5 @@
 import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 import { connect } from 'react-redux';
-import { distanceInWordsToNow } from 'date-fns';
-import { fromUnixTime } from 'utils/time';
 import { getStories, getNumPages, isBusy } from 'store/reducer';
 import {
   Grow,
@@ -16,23 +14,7 @@ import { Link } from 'react-router-dom';
 import { readStories } from 'store/actions';
 import PropTypes from 'prop-types';
 import React, { Fragment, useEffect } from 'react';
-
-/**
- * @constant
- * @function
- * @param {object} obj
- * @param {by} obj.by
- * @param {number} obj.time
- * @returns {string}
- * @todo i18n.
- */
-const getSecondaryText = ({ by, score, time }) =>
-  `${score} ${score === 1 ? 'point' : 'points'} by ${by} ${distanceInWordsToNow(
-    fromUnixTime(time),
-    {
-      addSuffix: true,
-    }
-  )}`;
+import Subtitle from 'components/Subtitle';
 
 /**
  * @constant
@@ -61,11 +43,7 @@ const Listing = (
                   primaryTypographyProps={{
                     component: 'h2',
                   }}
-                  secondary={getSecondaryText({
-                    by,
-                    score,
-                    time,
-                  })}
+                  secondary={<Subtitle by={by} score={score} time={time} />}
                 />
               </ListItem>
             </li>

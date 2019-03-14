@@ -31,7 +31,7 @@ const Header = ({ classes, history, lastLocation, title }) => (
           <IconButton
             className={classes.arrow}
             onClick={() => {
-              history.push(get(lastLocation, 'pathname'));
+              history.push(get(lastLocation, 'pathname', '/'));
             }}
           >
             <ArrowBack />

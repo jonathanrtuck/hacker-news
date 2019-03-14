@@ -48,16 +48,14 @@ export default (state = initialState, action) => {
           return {
             ...state,
             busy: true,
-            items: state.items.map((obj) => ({
-              ...obj,
-              active: obj.id === get(action, 'payload.id'),
-            })),
+            items: [],
           };
 
         case SUCCESS:
           return {
             ...state,
             busy: false,
+            items: get(action, 'payload.items'),
           };
 
         default:

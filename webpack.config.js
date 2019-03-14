@@ -4,6 +4,7 @@ const path = require('path');
 module.exports = {
   context: path.resolve('src'),
   devServer: {
+    compress: true,
     contentBase: path.resolve(__dirname, 'dist'),
     historyApiFallback: true,
   },
@@ -22,6 +23,7 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
+    publicPath: '/',
   },
   plugins: [
     new HtmlWebpackPlugin({

@@ -8,10 +8,11 @@ import {
   getUrl,
   isBusy,
 } from 'store/reducer';
-import { LinearProgress, Typography } from '@material-ui/core';
+import { LinearProgress, Typography, withStyles } from '@material-ui/core';
 import { readStory } from 'store/actions';
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
+import Subtitle from 'components/Subtitle';
 
 /**
  * @constant
@@ -20,7 +21,7 @@ import React, { useEffect } from 'react';
  * @returns {ReactElement}
  */
 const Story = (
-  { by, comments, id, isBusy, readStory, score, time, url } // eslint-disable-line no-shadow
+  { by, classes, comments, id, isBusy, readStory, score, time, url } // eslint-disable-line no-shadow
 ) => {
   useEffect(() => {
     readStory(id);
@@ -29,18 +30,26 @@ const Story = (
   return isBusy ? (
     <LinearProgress />
   ) : (
-    <div>
-      <Typography>{by}</Typography>
-      <Typography>{score}</Typography>
-      <Typography>{time}</Typography>
-      <Typography>{url}</Typography>
-      {comments.map(Comment)}
-    </div>
+    <article className={classes.root}>
+      <Typography component="a" href={url} variant="h6">
+        {url}
+      </Typography>
+      <Typography>
+        <Subtitle by={by} score={score} time={time} />
+      </Typography>
+      <aside>
+        <Typography component="h2" variant="srOnly">
+          Comments
+        </Typography>
+        {comments.map(Comment)}
+      </aside>
+    </article>
   );
 };
 
 Story.propTypes = {
-  by: PropTypes.string.isRequired,
+  by: PropTypes.string,
+  classes: PropTypes.objectOf(PropTypes.string).isRequired,
   comments: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
@@ -49,9 +58,16 @@ Story.propTypes = {
   id: PropTypes.number.isRequired,
   isBusy: PropTypes.bool.isRequired,
   readStory: PropTypes.func.isRequired,
-  score: PropTypes.number.isRequired,
-  time: PropTypes.number.isRequired,
-  url: PropTypes.string.isRequired,
+  score: PropTypes.number,
+  time: PropTypes.number,
+  url: PropTypes.string,
+};
+
+Story.defaultProps = {
+  by: '',
+  score: 0,
+  time: 0,
+  url: '',
 };
 
 /**
@@ -69,4 +85,10 @@ export default connect(
   {
     readStory,
   }
-)(Story);
+)(
+  withStyles((theme) => ({
+    root: {
+      padding: theme.spacing.unit * 2,
+    },
+  }))(Story)
+);
