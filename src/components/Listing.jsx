@@ -6,14 +6,15 @@ import {
   LinearProgress,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
   Typography,
   withStyles,
 } from '@material-ui/core';
 import { Link } from 'react-router-dom';
-import { readStories } from 'store/actions';
 import PropTypes from 'prop-types';
 import React, { Fragment, useEffect } from 'react';
+import { readPosts } from 'store/actions';
 import Subtitle from 'components/Subtitle';
 
 /**
@@ -23,10 +24,10 @@ import Subtitle from 'components/Subtitle';
  * @returns {ReactElement}
  */
 const Listing = (
-  { classes, isBusy, items, readStories, numPages, page, perPage } // eslint-disable-line no-shadow
+  { classes, isBusy, items, numPages, page, perPage, readPosts } // eslint-disable-line no-shadow
 ) => {
   useEffect(() => {
-    readStories(page);
+    readPosts(page);
   }, [page]);
 
   return isBusy ? (
@@ -37,13 +38,11 @@ const Listing = (
         {items.map(({ by, id, score, time, title }, i) => (
           <li key={id}>
             <ListItem button component={Link} to={`/item/${id}`}>
-              <Typography
-                className={classes.index}
-                color="textSecondary"
-                variant="overline"
-              >
-                {page * perPage + i + 1}
-              </Typography>
+              <ListItemIcon>
+                <Typography color="textSecondary" variant="overline">
+                  {page * perPage + i + 1}
+                </Typography>
+              </ListItemIcon>
               <ListItemText
                 primary={title}
                 primaryTypographyProps={{
@@ -92,7 +91,7 @@ Listing.propTypes = {
   numPages: PropTypes.number.isRequired,
   page: PropTypes.number.isRequired,
   perPage: PropTypes.number.isRequired,
-  readStories: PropTypes.func.isRequired,
+  readPosts: PropTypes.func.isRequired,
 };
 
 /**
@@ -106,15 +105,12 @@ export default connect(
     perPage: getPerPage(state),
   }),
   {
-    readStories,
+    readPosts,
   }
 )(
   withStyles((theme) => ({
     arrow: {
       margin: theme.spacing.unit,
-    },
-    index: {
-      marginRight: theme.spacing.unit,
     },
     nav: {
       display: 'flex',

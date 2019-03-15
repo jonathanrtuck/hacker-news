@@ -2,7 +2,7 @@ import axios from 'axios';
 import { flatMap, filter, map } from 'rxjs/operators';
 import { flattenDeep, get, isArray, isEmpty, property } from 'lodash-es';
 import { ofType } from 'redux-observable';
-import { REQUEST, STORY_READ, SUCCESS } from 'store/actions';
+import { POST_READ, REQUEST, SUCCESS } from 'store/actions';
 
 /**
  * @constant
@@ -52,7 +52,7 @@ const getKids = (obj) => {
  * @param {number} obj.offset
  * @returns {Promise}
  */
-const getStory = ({ id }) =>
+const getPost = ({ id }) =>
   axios({
     method: 'get',
     url: `${url}/item/${id}.json`,
@@ -68,10 +68,10 @@ const getStory = ({ id }) =>
  */
 export default (action$) =>
   action$.pipe(
-    ofType(STORY_READ),
+    ofType(POST_READ),
     filter((action) => get(action, 'meta.status') === REQUEST),
     flatMap((action) =>
-      getStory({
+      getPost({
         id: get(action, 'payload.id'),
       }).then((items) => ({
         items,
@@ -82,6 +82,6 @@ export default (action$) =>
         status: SUCCESS,
       },
       payload,
-      type: STORY_READ,
+      type: POST_READ,
     }))
   );

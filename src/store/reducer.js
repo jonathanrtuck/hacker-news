@@ -1,4 +1,4 @@
-import { REQUEST, STORIES_READ, STORY_READ, SUCCESS } from 'store/actions';
+import { POST_READ, POSTS_READ, REQUEST, SUCCESS } from 'store/actions';
 import { filter, find, get, matchesProperty } from 'lodash-es';
 
 /**
@@ -20,7 +20,27 @@ export const initialState = {
  */
 export default (state = initialState, action) => {
   switch (get(action, 'type')) {
-    case STORIES_READ:
+    case POST_READ:
+      switch (get(action, 'meta.status')) {
+        case REQUEST:
+          return {
+            ...state,
+            busy: true,
+            items: [],
+          };
+
+        case SUCCESS:
+          return {
+            ...state,
+            busy: false,
+            items: get(action, 'payload.items'),
+          };
+
+        default:
+          return state;
+      }
+
+    case POSTS_READ:
       switch (get(action, 'meta.status')) {
         case REQUEST:
           return {
@@ -42,26 +62,6 @@ export default (state = initialState, action) => {
           return state;
       }
 
-    case STORY_READ:
-      switch (get(action, 'meta.status')) {
-        case REQUEST:
-          return {
-            ...state,
-            busy: true,
-            items: [],
-          };
-
-        case SUCCESS:
-          return {
-            ...state,
-            busy: false,
-            items: get(action, 'payload.items'),
-          };
-
-        default:
-          return state;
-      }
-
     default:
       return state;
   }
@@ -72,36 +72,43 @@ export default (state = initialState, action) => {
  * @function
  * @param {object} state
  * @param {number} id
- * @returns {string}
+ * @returns {?object}
  */
-export const getBy = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'by');
+const getItem = (state, id) =>
+  find(get(state, 'items'), matchesProperty('id', id));
 
 /**
  * @constant
  * @function
  * @param {object} state
  * @param {number} id
- * @returns {string}
+ * @returns {?string}
  */
-export const getDeleted = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'deleted');
+export const getBy = (state, id) => get(getItem(state, id), 'by');
 
 /**
  * @constant
  * @function
  * @param {object} state
  * @param {number} id
- * @returns {object[]}
+ * @returns {?boolean}
  */
-export const getKids = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'kids');
+export const getDeleted = (state, id) => get(getItem(state, id), 'deleted');
 
 /**
  * @constant
  * @function
  * @param {object} state
- * @returns {boolean}
+ * @param {number} id
+ * @returns {?object[]}
+ */
+export const getKids = (state, id) => get(getItem(state, id), 'kids');
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
+ * @returns {number}
  */
 export const getNumPages = (state) =>
   Math.ceil(get(state, 'count') / get(state, 'perPage'));
@@ -110,7 +117,7 @@ export const getNumPages = (state) =>
  * @constant
  * @function
  * @param {object} state
- * @returns {object[]}
+ * @returns {number}
  */
 export const getPerPage = (state) => get(state, 'perPage');
 
@@ -121,8 +128,8 @@ export const getPerPage = (state) => get(state, 'perPage');
  * @returns {object[]}
  */
 export const getPosts = (state) =>
-  filter(get(state, 'items'), ({ type }) => {
-    switch (type) {
+  filter(get(state, 'items'), (obj) => {
+    switch (get(obj, 'type')) {
       case 'job':
       case 'poll':
       case 'story':
@@ -140,8 +147,7 @@ export const getPosts = (state) =>
  * @param {number} id
  * @returns {number}
  */
-export const getScore = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'score');
+export const getScore = (state, id) => get(getItem(state, id), 'score');
 
 /**
  * @constant
@@ -150,8 +156,7 @@ export const getScore = (state, id) =>
  * @param {number} id
  * @returns {number}
  */
-export const getText = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'text');
+export const getText = (state, id) => get(getItem(state, id), 'text');
 
 /**
  * @constant
@@ -160,8 +165,7 @@ export const getText = (state, id) =>
  * @param {number} id
  * @returns {number}
  */
-export const getTime = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'time');
+export const getTime = (state, id) => get(getItem(state, id), 'time');
 
 /**
  * @constant
@@ -170,8 +174,7 @@ export const getTime = (state, id) =>
  * @param {number} id
  * @returns {string}
  */
-export const getTitle = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'title');
+export const getTitle = (state, id) => get(getItem(state, id), 'title');
 
 /**
  * @constant
@@ -180,8 +183,7 @@ export const getTitle = (state, id) =>
  * @param {number} id
  * @returns {string}
  */
-export const getUrl = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'url');
+export const getUrl = (state, id) => get(getItem(state, id), 'url');
 
 /**
  * @constant

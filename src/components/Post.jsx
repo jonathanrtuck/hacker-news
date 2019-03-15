@@ -14,9 +14,9 @@ import {
   Typography,
   withStyles,
 } from '@material-ui/core';
-import { readStory } from 'store/actions';
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
+import { readPost } from 'store/actions';
 import Subtitle from 'components/Subtitle';
 
 /**
@@ -26,10 +26,10 @@ import Subtitle from 'components/Subtitle';
  * @returns {ReactElement}
  */
 const Story = (
-  { by, classes, id, isBusy, kids, readStory, score, time, url } // eslint-disable-line no-shadow
+  { by, classes, id, isBusy, kids, readPost, score, time, url } // eslint-disable-line no-shadow
 ) => {
   useEffect(() => {
-    readStory(id);
+    readPost(id);
   }, [id]);
 
   return isBusy ? (
@@ -65,7 +65,7 @@ Story.propTypes = {
   id: PropTypes.number.isRequired,
   isBusy: PropTypes.bool.isRequired,
   kids: PropTypes.arrayOf(PropTypes.number),
-  readStory: PropTypes.func.isRequired,
+  readPost: PropTypes.func.isRequired,
   score: PropTypes.number,
   time: PropTypes.number,
   url: PropTypes.string,
@@ -92,7 +92,7 @@ export default connect(
     url: getUrl(state, id),
   }),
   {
-    readStory,
+    readPost,
   }
 )(
   withStyles((theme) => ({

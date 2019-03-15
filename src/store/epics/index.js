@@ -1,8 +1,8 @@
 import { combineEpics } from 'redux-observable';
-import stories from './stories';
-import story from './story';
+import post from './post';
+import posts from './posts';
 
 /**
  * @type {function}
  */
-export default combineEpics(stories, story);
+export default combineEpics(post, posts);

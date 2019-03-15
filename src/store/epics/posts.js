@@ -3,7 +3,7 @@ import { drop, get, property, take } from 'lodash-es';
 import { flatMap, filter, map } from 'rxjs/operators';
 import { getPerPage } from 'store/reducer';
 import { ofType } from 'redux-observable';
-import { REQUEST, STORIES_READ, SUCCESS } from 'store/actions';
+import { POSTS_READ, REQUEST, SUCCESS } from 'store/actions';
 
 /**
  * @constant
@@ -20,7 +20,7 @@ const url = 'https://hacker-news.firebaseio.com/v0';
  * @param {number} obj.offset
  * @returns {Promise}
  */
-const getStories = ({ first, offset }) => {
+const getPosts = ({ first, offset }) => {
   let count;
 
   return axios({
@@ -56,7 +56,7 @@ const getStories = ({ first, offset }) => {
  */
 export default (action$, state$) =>
   action$.pipe(
-    ofType(STORIES_READ),
+    ofType(POSTS_READ),
     filter((action) => get(action, 'meta.status') === REQUEST),
     flatMap((action) => {
       /**
@@ -70,7 +70,7 @@ export default (action$, state$) =>
        */
       const perPage = getPerPage(state$.value);
 
-      return getStories({
+      return getPosts({
         first: perPage,
         offset: page * perPage,
       });
@@ -80,6 +80,6 @@ export default (action$, state$) =>
         status: SUCCESS,
       },
       payload,
-      type: STORIES_READ,
+      type: POSTS_READ,
     }))
   );
