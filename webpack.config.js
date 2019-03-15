@@ -37,6 +37,7 @@ module.exports = (env, { mode }) => {
         minify: {
           collapseWhitespace: true,
           removeComments: true,
+          removeOptionalTags: true,
           removeRedundantAttributes: true,
           removeScriptTypeAttributes: true,
           removeStyleLinkTypeAttributes: true,
