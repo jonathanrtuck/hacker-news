@@ -10,7 +10,7 @@ import store from 'store';
 render(
   <Fragment>
     <CssBaseline />
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_PATH}>
       <LastLocationProvider>
         <Provider store={store}>
           <App />

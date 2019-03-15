@@ -26,4 +26,6 @@ This will start a hot-reloading development environment accessible locally at [l
 yarn build
 ```
 
-This will perform an optimized production build. The contents of the `/dist` folder can then be deployed to the production server.
+This will perform an optimized production build. The contents of the _/dist_ folder can then be deployed to the production server.
+
+**Note:** You may need to modify the `publicPath` in _webpack.config.js_ to match the server's directory structure.

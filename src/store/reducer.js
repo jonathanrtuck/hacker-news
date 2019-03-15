@@ -9,7 +9,7 @@ export const initialState = {
   busy: false,
   count: 0,
   items: [],
-  perPage: 10,
+  perPage: 20,
 };
 
 /**
