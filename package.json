@@ -50,5 +50,5 @@
     "build": "webpack --debug --display-error-details --display-reasons --mode=production --progress",
     "develop": "webpack-dev-server --mode=development"
   },
-  "version": "0.0.1"
+  "version": "1.0.0"
 }
