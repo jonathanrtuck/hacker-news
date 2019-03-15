@@ -82,6 +82,16 @@ export const getBy = (state, id) =>
  * @function
  * @param {object} state
  * @param {number} id
+ * @returns {string}
+ */
+export const getDeleted = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'deleted');
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
+ * @param {number} id
  * @returns {object[]}
  */
 export const getKids = (state, id) =>
