@@ -39,7 +39,7 @@ const Story = (
       <Typography component="a" href={url} variant="h6">
         {url}
       </Typography>
-      <Typography>
+      <Typography color="textSecondary">
         <Subtitle by={by} score={score} time={time} />
       </Typography>
       <List

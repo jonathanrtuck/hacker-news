@@ -118,20 +118,30 @@ export const getPerPage = (state) => get(state, 'perPage');
  * @constant
  * @function
  * @param {object} state
- * @param {number} id
- * @returns {number}
+ * @returns {object[]}
  */
-export const getScore = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'score');
+export const getPosts = (state) =>
+  filter(get(state, 'items'), ({ type }) => {
+    switch (type) {
+      case 'job':
+      case 'poll':
+      case 'story':
+        return true;
+
+      default:
+        return false;
+    }
+  });
 
 /**
  * @constant
  * @function
  * @param {object} state
- * @returns {object[]}
+ * @param {number} id
+ * @returns {number}
  */
-export const getStories = (state) =>
-  filter(get(state, 'items'), matchesProperty('type', 'story'));
+export const getScore = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'score');
 
 /**
  * @constant
