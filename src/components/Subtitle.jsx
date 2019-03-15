@@ -1,5 +1,6 @@
 import { distanceInWordsToNow } from 'date-fns';
 import { fromUnixTime } from 'utils/time';
+import { isInteger } from 'lodash-es';
 import PropTypes from 'prop-types';
 
 /**
@@ -9,16 +10,15 @@ import PropTypes from 'prop-types';
  * @returns {ReactElement}
  */
 const Subtitle = ({ by, score, time }) =>
-  `${score} ${score === 1 ? 'point' : 'points'} by ${by} ${distanceInWordsToNow(
-    fromUnixTime(time),
-    {
-      addSuffix: true,
-    }
-  )}`;
+  `${
+    isInteger(score) ? `${score} ${score === 1 ? 'point' : 'points'} ` : ''
+  }by ${by} ${distanceInWordsToNow(fromUnixTime(time), {
+    addSuffix: true,
+  })}`;
 
 Subtitle.propTypes = {
   by: PropTypes.string.isRequired,
-  score: PropTypes.number.isRequired,
+  score: PropTypes.number,
   time: PropTypes.number.isRequired,
 };
 

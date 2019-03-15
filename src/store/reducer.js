@@ -84,12 +84,8 @@ export const getBy = (state, id) =>
  * @param {number} id
  * @returns {object[]}
  */
-export const getComments = (state, id) =>
-  get(find(get(state, 'items'), matchesProperty('id', id)), 'kids', []).map(
-    (commentId) => ({
-      id: commentId,
-    })
-  );
+export const getKids = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'kids');
 
 /**
  * @constant
@@ -126,6 +122,16 @@ export const getScore = (state, id) =>
  */
 export const getStories = (state) =>
   filter(get(state, 'items'), matchesProperty('type', 'story'));
+
+/**
+ * @constant
+ * @function
+ * @param {object} state
+ * @param {number} id
+ * @returns {number}
+ */
+export const getText = (state, id) =>
+  get(find(get(state, 'items'), matchesProperty('id', id)), 'text');
 
 /**
  * @constant

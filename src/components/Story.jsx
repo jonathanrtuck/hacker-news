@@ -2,13 +2,18 @@ import Comment from 'components/Comment';
 import { connect } from 'react-redux';
 import {
   getBy,
-  getComments,
+  getKids,
   getScore,
   getTime,
   getUrl,
   isBusy,
 } from 'store/reducer';
-import { LinearProgress, Typography, withStyles } from '@material-ui/core';
+import {
+  LinearProgress,
+  List,
+  Typography,
+  withStyles,
+} from '@material-ui/core';
 import { readStory } from 'store/actions';
 import PropTypes from 'prop-types';
 import React, { useEffect } from 'react';
@@ -21,7 +26,7 @@ import Subtitle from 'components/Subtitle';
  * @returns {ReactElement}
  */
 const Story = (
-  { by, classes, comments, id, isBusy, readStory, score, time, url } // eslint-disable-line no-shadow
+  { by, classes, id, isBusy, kids, readStory, score, time, url } // eslint-disable-line no-shadow
 ) => {
   useEffect(() => {
     readStory(id);
@@ -37,12 +42,19 @@ const Story = (
       <Typography>
         <Subtitle by={by} score={score} time={time} />
       </Typography>
-      <aside>
-        <Typography component="h2" variant="srOnly">
-          Comments
-        </Typography>
-        {comments.map(Comment)}
-      </aside>
+      <List
+        className={classes.comments}
+        component="aside"
+        subheader={
+          <Typography component="h2" variant="srOnly">
+            Comments
+          </Typography>
+        }
+      >
+        {kids.map((commentId) => (
+          <Comment id={commentId} key={commentId} level={1} />
+        ))}
+      </List>
     </article>
   );
 };
@@ -50,13 +62,9 @@ const Story = (
 Story.propTypes = {
   by: PropTypes.string,
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
-  comments: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-    })
-  ).isRequired,
   id: PropTypes.number.isRequired,
   isBusy: PropTypes.bool.isRequired,
+  kids: PropTypes.arrayOf(PropTypes.number),
   readStory: PropTypes.func.isRequired,
   score: PropTypes.number,
   time: PropTypes.number,
@@ -65,6 +73,7 @@ Story.propTypes = {
 
 Story.defaultProps = {
   by: '',
+  kids: [],
   score: 0,
   time: 0,
   url: '',
@@ -76,8 +85,8 @@ Story.defaultProps = {
 export default connect(
   (state, { id }) => ({
     by: getBy(state, id),
-    comments: getComments(state, id),
     isBusy: isBusy(state),
+    kids: getKids(state, id),
     score: getScore(state, id),
     time: getTime(state, id),
     url: getUrl(state, id),
@@ -87,6 +96,9 @@ export default connect(
   }
 )(
   withStyles((theme) => ({
+    comments: {
+      marginTop: theme.spacing.unit * 2,
+    },
     root: {
       padding: theme.spacing.unit * 2,
     },

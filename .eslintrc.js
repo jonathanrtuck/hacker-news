@@ -21,6 +21,12 @@ module.exports = {
   plugins: ['react', 'react-hooks', 'prettier'],
   rules: {
     'prettier/prettier': ['error'],
+    'react/jsx-wrap-multilines': [
+      'error',
+      {
+        prop: 'ignore',
+      },
+    ],
   },
   settings: {
     'import/resolver': {

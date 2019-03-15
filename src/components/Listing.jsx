@@ -2,7 +2,6 @@ import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 import { connect } from 'react-redux';
 import { getStories, getNumPages, isBusy } from 'store/reducer';
 import {
-  Grow,
   IconButton,
   LinearProgress,
   List,
@@ -35,19 +34,17 @@ const Listing = (
     <Fragment>
       <List>
         {items.map(({ by, id, score, time, title }) => (
-          <Grow in key={id}>
-            <li>
-              <ListItem button component={Link} to={`/item/${id}`}>
-                <ListItemText
-                  primary={title}
-                  primaryTypographyProps={{
-                    component: 'h2',
-                  }}
-                  secondary={<Subtitle by={by} score={score} time={time} />}
-                />
-              </ListItem>
-            </li>
-          </Grow>
+          <li key={id}>
+            <ListItem button component={Link} to={`/item/${id}`}>
+              <ListItemText
+                primary={title}
+                primaryTypographyProps={{
+                  component: 'h2',
+                }}
+                secondary={<Subtitle by={by} score={score} time={time} />}
+              />
+            </ListItem>
+          </li>
         ))}
       </List>
       <nav className={classes.nav}>
