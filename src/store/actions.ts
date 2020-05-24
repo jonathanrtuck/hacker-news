@@ -39,6 +39,7 @@ export interface PostsReadAction extends ReduxAction<ActionType> {
   meta: Meta;
   payload?: {
     count?: number;
+    page?: number;
     posts?: Post[];
   };
   type: ActionType.ReadPosts;
@@ -77,6 +78,9 @@ export const readPosts = (page: number): ThunkAction => (
   dispatch({
     meta: {
       status: Status.Request,
+    },
+    payload: {
+      page,
     },
     type: ActionType.ReadPosts,
   });
