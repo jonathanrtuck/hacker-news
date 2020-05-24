@@ -3,14 +3,16 @@ module.exports = {
     amd: true,
     browser: true,
     es6: true,
+    node: true,
   },
   extends: [
     'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint',
     'plugin:react/recommended',
-    'airbnb',
-    'prettier',
+    'plugin:prettier/recommended',
   ],
-  parser: 'babel-eslint',
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
@@ -18,9 +20,11 @@ module.exports = {
     ecmaVersion: 2018,
     sourceType: 'module',
   },
-  plugins: ['react', 'react-hooks', 'prettier'],
+  plugins: ['react', 'prettier'],
   rules: {
+    '@typescript-eslint/no-explicit-any': 'warn',
     'prettier/prettier': ['error'],
+    'react/jsx-sort-props': 'error',
     'react/jsx-wrap-multilines': [
       'error',
       {
@@ -29,13 +33,16 @@ module.exports = {
     ],
   },
   settings: {
+    'import/parsers': {
+      '@typescript-eslint/parser': ['.ts', '.tsx'],
+    },
     'import/resolver': {
       node: {
         paths: ['src'],
       },
     },
     react: {
-      version: '16.0',
+      version: 'detect',
     },
   },
 };

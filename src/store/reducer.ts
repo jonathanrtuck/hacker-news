@@ -1,48 +1,44 @@
-import { POST_READ, POSTS_READ, REQUEST, SUCCESS } from 'store/actions';
-import { filter, find, get, matchesProperty } from 'lodash-es';
+import { Action, ActionType, Status } from 'store/actions';
 
-/**
- * @constant
- * @type {object}
- */
-export const initialState = {
+interface State {
+  busy: boolean;
+  count: number;
+  items: unknown[];
+  perPage: number;
+}
+
+export const initialState: State = {
   busy: false,
   count: 0,
   items: [],
   perPage: 20,
 };
 
-/**
- * @function
- * @param {object} state
- * @param {object} action
- * @returns {object}
- */
-export default (state = initialState, action) => {
-  switch (get(action, 'type')) {
-    case POST_READ:
-      switch (get(action, 'meta.status')) {
-        case REQUEST:
+export default (state: State = initialState, action: Action): State => {
+  switch (action.type) {
+    case ActionType.PostRead:
+      switch (action.meta.status) {
+        case Status.Request:
           return {
             ...state,
             busy: true,
             items: [],
           };
 
-        case SUCCESS:
+        case Status.Success:
           return {
             ...state,
             busy: false,
-            items: get(action, 'payload.items'),
+            items: action.payload.items,
           };
 
         default:
           return state;
       }
 
-    case POSTS_READ:
-      switch (get(action, 'meta.status')) {
-        case REQUEST:
+    case ActionType.PostsRead:
+      switch (action.meta.status) {
+        case Status.Request:
           return {
             ...state,
             busy: true,
@@ -50,12 +46,12 @@ export default (state = initialState, action) => {
             items: [],
           };
 
-        case SUCCESS:
+        case Status.Success:
           return {
             ...state,
             busy: false,
-            count: get(action, 'payload.count'),
-            items: get(action, 'payload.items'),
+            count: action.payload.count,
+            items: action.payload.items,
           };
 
         default:
@@ -73,7 +69,7 @@ export default (state = initialState, action) => {
  * @param {object} state
  * @param {number} id
  * @returns {?object}
- */
+ *
 const getItem = (state, id) =>
   find(get(state, 'items'), matchesProperty('id', id));
 
@@ -83,7 +79,7 @@ const getItem = (state, id) =>
  * @param {object} state
  * @param {number} id
  * @returns {?string}
- */
+ *
 export const getBy = (state, id) => get(getItem(state, id), 'by');
 
 /**
@@ -92,7 +88,7 @@ export const getBy = (state, id) => get(getItem(state, id), 'by');
  * @param {object} state
  * @param {number} id
  * @returns {?boolean}
- */
+ *
 export const getDeleted = (state, id) => get(getItem(state, id), 'deleted');
 
 /**
@@ -101,7 +97,7 @@ export const getDeleted = (state, id) => get(getItem(state, id), 'deleted');
  * @param {object} state
  * @param {number} id
  * @returns {?object[]}
- */
+ *
 export const getKids = (state, id) => get(getItem(state, id), 'kids');
 
 /**
@@ -109,7 +105,7 @@ export const getKids = (state, id) => get(getItem(state, id), 'kids');
  * @function
  * @param {object} state
  * @returns {number}
- */
+ *
 export const getNumPages = (state) =>
   Math.ceil(get(state, 'count') / get(state, 'perPage'));
 
@@ -118,7 +114,7 @@ export const getNumPages = (state) =>
  * @function
  * @param {object} state
  * @returns {number}
- */
+ *
 export const getPerPage = (state) => get(state, 'perPage');
 
 /**
@@ -126,7 +122,7 @@ export const getPerPage = (state) => get(state, 'perPage');
  * @function
  * @param {object} state
  * @returns {object[]}
- */
+ *
 export const getPosts = (state) =>
   filter(get(state, 'items'), (obj) => {
     switch (get(obj, 'type')) {
@@ -146,7 +142,7 @@ export const getPosts = (state) =>
  * @param {object} state
  * @param {number} id
  * @returns {number}
- */
+ *
 export const getScore = (state, id) => get(getItem(state, id), 'score');
 
 /**
@@ -155,7 +151,7 @@ export const getScore = (state, id) => get(getItem(state, id), 'score');
  * @param {object} state
  * @param {number} id
  * @returns {number}
- */
+ *
 export const getText = (state, id) => get(getItem(state, id), 'text');
 
 /**
@@ -164,7 +160,7 @@ export const getText = (state, id) => get(getItem(state, id), 'text');
  * @param {object} state
  * @param {number} id
  * @returns {number}
- */
+ *
 export const getTime = (state, id) => get(getItem(state, id), 'time');
 
 /**
@@ -173,7 +169,7 @@ export const getTime = (state, id) => get(getItem(state, id), 'time');
  * @param {object} state
  * @param {number} id
  * @returns {string}
- */
+ *
 export const getTitle = (state, id) => get(getItem(state, id), 'title');
 
 /**
@@ -182,7 +178,7 @@ export const getTitle = (state, id) => get(getItem(state, id), 'title');
  * @param {object} state
  * @param {number} id
  * @returns {string}
- */
+ *
 export const getUrl = (state, id) => get(getItem(state, id), 'url');
 
 /**
@@ -190,5 +186,6 @@ export const getUrl = (state, id) => get(getItem(state, id), 'url');
  * @function
  * @param {object} state
  * @returns {boolean}
- */
+ *
 export const isBusy = (state) => get(state, 'busy');
+*/
