@@ -1,17 +1,25 @@
 import { Action, ActionType, Status } from 'store/actions';
 import { Location } from 'history';
 
-interface State {
-  busy: boolean;
+export interface Item {
+  createdAt: Date;
+  createdBy: string;
+  id: number;
+  score: number;
+  title: string;
+}
+
+export interface State {
   count: number;
-  items: unknown[];
+  isBusy: boolean;
+  items: Item[];
   location: Location;
   perPage: number;
 }
 
 export const initialState: State = {
-  busy: false,
   count: 0,
+  isBusy: false,
   items: [],
   location: undefined,
   perPage: 20,
@@ -24,14 +32,14 @@ export default (state: State = initialState, action: Action): State => {
         case Status.Request:
           return {
             ...state,
-            busy: true,
+            isBusy: true,
             items: [],
           };
 
         case Status.Success:
           return {
             ...state,
-            busy: false,
+            isBusy: false,
             items: action.payload.items,
           };
 
@@ -44,16 +52,16 @@ export default (state: State = initialState, action: Action): State => {
         case Status.Request:
           return {
             ...state,
-            busy: true,
             count: 0,
+            isBusy: true,
             items: [],
           };
 
         case Status.Success:
           return {
             ...state,
-            busy: false,
             count: action.payload.count,
+            isBusy: false,
             items: action.payload.items,
           };
 

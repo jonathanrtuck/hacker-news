@@ -1,7 +1,35 @@
-import React, { FunctionComponent, ReactElement } from 'react';
+import { connect } from 'react-redux';
+import React, { FunctionComponent, ReactElement, useEffect } from 'react';
+import { State } from 'store';
+import { readPosts } from 'store/actions';
 
-const Listing: FunctionComponent<unknown> = (): ReactElement => (
-  <h1>listing…</h1>
-);
+interface PostProps {
+  isBusy: boolean;
+  page: number;
+  readPosts: (page: number) => void;
+}
 
-export default Listing;
+export const Listing: FunctionComponent<PostProps> = ({
+  isBusy,
+  page,
+  readPosts,
+}: PostProps): ReactElement => {
+  useEffect(() => {
+    readPosts(page);
+  }, [page]);
+
+  if (isBusy) {
+    return <h1>loading… {page}</h1>;
+  }
+
+  return <h1>listing… {page}</h1>;
+};
+
+export default connect(
+  (state: State) => ({
+    isBusy: state.isBusy,
+  }),
+  {
+    readPosts,
+  }
+)(Listing);

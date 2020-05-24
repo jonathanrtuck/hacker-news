@@ -1,6 +1,6 @@
 import React, { FunctionComponent, ReactElement } from 'react';
 
-const Comment: FunctionComponent<unknown> = (): ReactElement => (
+export const Comment: FunctionComponent<unknown> = (): ReactElement => (
   <h1>comment…</h1>
 );
 
