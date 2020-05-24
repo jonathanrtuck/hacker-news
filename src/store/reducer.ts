@@ -1,9 +1,11 @@
 import { Action, ActionType, Status } from 'store/actions';
+import { Location } from 'history';
 
 interface State {
   busy: boolean;
   count: number;
   items: unknown[];
+  location: Location;
   perPage: number;
 }
 
@@ -11,12 +13,13 @@ export const initialState: State = {
   busy: false,
   count: 0,
   items: [],
+  location: undefined,
   perPage: 20,
 };
 
 export default (state: State = initialState, action: Action): State => {
   switch (action.type) {
-    case ActionType.PostRead:
+    case ActionType.ReadPost:
       switch (action.meta.status) {
         case Status.Request:
           return {
@@ -36,7 +39,7 @@ export default (state: State = initialState, action: Action): State => {
           return state;
       }
 
-    case ActionType.PostsRead:
+    case ActionType.ReadPosts:
       switch (action.meta.status) {
         case Status.Request:
           return {
@@ -57,6 +60,12 @@ export default (state: State = initialState, action: Action): State => {
         default:
           return state;
       }
+
+    case ActionType.UpdateLocation:
+      return {
+        ...state,
+        location: action.payload.location,
+      };
 
     default:
       return state;

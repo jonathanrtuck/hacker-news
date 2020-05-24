@@ -1,8 +1,10 @@
+import { Location } from 'history';
 import { Action as ReduxAction } from 'redux';
 
 export enum ActionType {
-  PostRead = 'POST_READ',
-  PostsRead = 'POSTS_READ',
+  ReadPost = 'READ_POST',
+  ReadPosts = 'READ_POSTS',
+  UpdateLocation = 'UPDATE_LOCATION',
 }
 
 export enum Status {
@@ -21,7 +23,7 @@ export interface PostReadAction extends ReduxAction<ActionType> {
     id: number;
     items?: unknown[];
   };
-  type: ActionType.PostRead;
+  type: ActionType.ReadPost;
 }
 
 export interface PostsReadAction extends ReduxAction<ActionType> {
@@ -31,10 +33,17 @@ export interface PostsReadAction extends ReduxAction<ActionType> {
     index: number;
     items?: unknown[];
   };
-  type: ActionType.PostsRead;
+  type: ActionType.ReadPosts;
 }
 
-export type Action = PostReadAction | PostsReadAction;
+export interface UrlUpdateAction extends ReduxAction<ActionType> {
+  payload: {
+    location: Location;
+  };
+  type: ActionType.UpdateLocation;
+}
+
+export type Action = PostReadAction | PostsReadAction | UrlUpdateAction;
 
 export const readPost = (id: number): PostReadAction => ({
   meta: {
@@ -43,7 +52,7 @@ export const readPost = (id: number): PostReadAction => ({
   payload: {
     id,
   },
-  type: ActionType.PostRead,
+  type: ActionType.ReadPost,
 });
 
 export const readPosts = (index: number): PostsReadAction => ({
@@ -53,5 +62,12 @@ export const readPosts = (index: number): PostsReadAction => ({
   payload: {
     index,
   },
-  type: ActionType.PostsRead,
+  type: ActionType.ReadPosts,
+});
+
+export const updateLocation = (location: Location): UrlUpdateAction => ({
+  payload: {
+    location,
+  },
+  type: ActionType.UpdateLocation,
 });

@@ -10,6 +10,7 @@ module.exports = (env, { mode }) => {
     devServer: {
       compress: true,
       contentBase: path.resolve(__dirname, 'dist'),
+      historyApiFallback: true,
     },
     devtool: 'source-map',
     entry: 'index.tsx',
