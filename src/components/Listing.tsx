@@ -57,12 +57,12 @@ export const Listing: FunctionComponent<ListingProps> = ({
             <ListItem
               button
               component="a"
-              href={`/item/${id}`}
+              href={`/post/${id}`}
               onClick={(event: MouseEvent): void => {
                 event.preventDefault();
 
                 navigateTo({
-                  pathname: `/item/${id}`,
+                  pathname: `/post/${id}`,
                 });
               }}
             >
