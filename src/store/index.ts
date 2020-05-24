@@ -1,8 +1,9 @@
-import { Action, ExtraArgument } from 'store/actions';
 import { applyMiddleware, createStore, StoreEnhancer } from 'redux';
-import reducer from 'store/reducer';
-import { State } from 'store/reducer';
 import thunk, { ThunkDispatch } from 'redux-thunk';
+import { Action } from 'store/actions';
+import { ExtraArgument } from 'store/extra-argument';
+import reducer from 'store/reducer';
+import { State } from 'store/state';
 
 /**
  * @see https://github.com/HackerNews/API
@@ -16,7 +17,5 @@ const middleware: StoreEnhancer<{
     api: API_URL,
   })
 );
-
-export { State } from 'store/reducer';
 
 export default createStore(reducer, middleware);

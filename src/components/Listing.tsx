@@ -1,7 +1,7 @@
-import { connect } from 'react-redux';
 import React, { FunctionComponent, ReactElement, useEffect } from 'react';
-import { State } from 'store';
+import { connect } from 'react-redux';
 import { readPosts } from 'store/actions';
+import { State } from 'store/state';
 
 interface PostProps {
   isBusy: boolean;

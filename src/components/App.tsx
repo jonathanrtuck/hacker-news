@@ -1,10 +1,10 @@
-import { connect } from 'react-redux';
 import Listing from 'components/Listing';
+import Post from 'components/Post';
 import { Location } from 'history';
 import { match } from 'path-to-regexp';
-import Post from 'components/Post';
 import React, { FunctionComponent, ReactElement } from 'react';
-import { State } from 'store';
+import { connect } from 'react-redux';
+import { State } from 'store/state';
 
 interface AppProps {
   location: Location;

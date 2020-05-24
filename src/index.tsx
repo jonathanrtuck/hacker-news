@@ -1,9 +1,9 @@
-import { createBrowserHistory, History, Location } from 'history';
-import App from 'components/App';
 import { CssBaseline } from '@material-ui/core';
-import { Provider } from 'react-redux';
+import App from 'components/App';
+import { createBrowserHistory, History, Location } from 'history';
 import React, { Fragment } from 'react';
 import { render } from 'react-dom';
+import { Provider } from 'react-redux';
 import store from 'store';
 import { updateLocation } from 'store/actions';
 

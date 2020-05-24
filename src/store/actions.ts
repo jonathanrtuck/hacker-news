@@ -1,15 +1,12 @@
 import axios from 'axios';
 import { Location } from 'history';
 import { Action as ReduxAction } from 'redux';
-import { Item, State } from 'store/reducer';
 import {
   ThunkAction as ReduxThunkAction,
   ThunkDispatch as ReduxThunkDispatch,
 } from 'redux-thunk';
-
-export interface ExtraArgument {
-  api: string;
-}
+import { ExtraArgument } from 'store/extra-argument';
+import { Item, State } from 'store/state';
 
 export enum ActionType {
   ReadPost = 'READ_POST',
@@ -72,7 +69,6 @@ export const readPosts = (page: number): ThunkAction => (
   _: unknown,
   { api }: ExtraArgument
 ): void => {
-  console.debug(api);
   dispatch({
     meta: {
       status: Status.Request,
