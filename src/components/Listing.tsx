@@ -6,7 +6,7 @@ import { State } from 'store/state';
 interface PostProps {
   isBusy: boolean;
   page: number;
-  readPosts: (page: number) => void;
+  readPosts: typeof readPosts;
 }
 
 export const Listing: FunctionComponent<PostProps> = ({

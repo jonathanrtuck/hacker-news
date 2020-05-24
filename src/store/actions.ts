@@ -1,12 +1,14 @@
-import axios from 'axios';
+import axios, { AxiosPromise } from 'axios';
+import { fromUnixTime } from 'date-fns';
 import { Location } from 'history';
+import { drop, property, take } from 'lodash-es';
 import { Action as ReduxAction } from 'redux';
 import {
   ThunkAction as ReduxThunkAction,
   ThunkDispatch as ReduxThunkDispatch,
 } from 'redux-thunk';
 import { ExtraArgument } from 'store/extra-argument';
-import { Item, State } from 'store/state';
+import { Post, State } from 'store/state';
 
 export enum ActionType {
   ReadPost = 'READ_POST',
@@ -28,7 +30,7 @@ export interface PostReadAction extends ReduxAction<ActionType> {
   meta: Meta;
   payload: {
     id: number;
-    items?: Item[];
+    posts?: Post[];
   };
   type: ActionType.ReadPost;
 }
@@ -37,7 +39,7 @@ export interface PostsReadAction extends ReduxAction<ActionType> {
   meta: Meta;
   payload?: {
     count?: number;
-    items?: Item[];
+    posts?: Post[];
   };
   type: ActionType.ReadPosts;
 }
@@ -66,9 +68,12 @@ export const readPost = (id: number): PostReadAction => ({
 
 export const readPosts = (page: number): ThunkAction => (
   dispatch: ThunkDispatch,
-  _: unknown,
+  getState: () => State,
   { api }: ExtraArgument
 ): void => {
+  const { perPage } = getState();
+  let count: number;
+
   dispatch({
     meta: {
       status: Status.Request,
@@ -79,9 +84,45 @@ export const readPosts = (page: number): ThunkAction => (
   axios({
     method: 'get',
     url: `${api}/topstories.json`,
-  }).then((a) => {
-    console.debug(a);
-  });
+  })
+    .then(property<unknown, number[]>('data'))
+    .then((ids: number[]) => {
+      count = ids.length;
+
+      return take(drop(ids, page * perPage), perPage);
+    })
+    .then((ids: number[]) =>
+      ids.map(
+        (id): AxiosPromise<unknown> =>
+          axios({
+            method: 'get',
+            url: `${api}/item/${id}.json`,
+          })
+      )
+    )
+    .then(axios.all)
+    .then((responses: unknown[]): void => {
+      const posts: Post[] = responses
+        .map(property('data'))
+        .map(({ by, id, score, time, title }) => ({
+          createdAt: fromUnixTime(time),
+          createdBy: by,
+          id,
+          score,
+          title,
+        }));
+
+      dispatch({
+        meta: {
+          status: Status.Success,
+        },
+        payload: {
+          count,
+          posts,
+        },
+        type: ActionType.ReadPosts,
+      });
+    });
 };
 
 export const updateLocation = (location: Location): ThunkAction => (

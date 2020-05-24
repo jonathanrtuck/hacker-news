@@ -9,14 +9,14 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
           return {
             ...state,
             isBusy: true,
-            items: [],
+            posts: [],
           };
 
         case Status.Success:
           return {
             ...state,
             isBusy: false,
-            items: action.payload.items,
+            posts: action.payload.posts,
           };
 
         default:
@@ -30,7 +30,7 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
             ...state,
             count: 0,
             isBusy: true,
-            items: [],
+            posts: [],
           };
 
         case Status.Success:
@@ -38,7 +38,7 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
             ...state,
             count: action.payload.count,
             isBusy: false,
-            items: action.payload.items,
+            posts: action.payload.posts,
           };
 
         default:
