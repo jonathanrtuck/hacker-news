@@ -68,7 +68,7 @@ export const Post: FunctionComponent<PostProps> = ({
 
   useEffect(() => {
     readPost(id);
-  }, [id]);
+  }, [id, readPost]);
 
   if (isBusy) {
     return <LinearProgress />;

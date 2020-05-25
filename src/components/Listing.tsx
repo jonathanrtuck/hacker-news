@@ -74,7 +74,7 @@ export const Listing: FunctionComponent<ListingProps> = ({
 
   useEffect(() => {
     readPosts(index);
-  }, [index]);
+  }, [index, readPosts]);
 
   if (isBusy) {
     return <LinearProgress />;
