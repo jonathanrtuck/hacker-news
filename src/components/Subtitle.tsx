@@ -1,5 +1,4 @@
 import { formatDistanceToNow } from 'date-fns';
-import { isNil } from 'lodash-es';
 import React, { FunctionComponent, ReactElement } from 'react';
 
 interface SubtitleProps {
@@ -15,7 +14,7 @@ export const Subtitle: FunctionComponent<SubtitleProps> = ({
 }: SubtitleProps): ReactElement => (
   <span>
     {score} {score === 1 ? 'point' : 'points'} by {createdBy}{' '}
-    {!isNil(createdAt) && formatDistanceToNow(createdAt)}
+    {createdAt && formatDistanceToNow(createdAt)}
   </span>
 );
 

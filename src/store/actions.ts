@@ -1,7 +1,6 @@
-import axios, { AxiosPromise } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { fromUnixTime } from 'date-fns';
 import { Location } from 'history';
-import { drop, property, take } from 'lodash-es';
 import { Action as ReduxAction } from 'redux';
 import {
   ThunkAction as ReduxThunkAction,
@@ -57,11 +56,11 @@ export type Action = PostReadAction | PostsReadAction | UrlUpdateAction;
 export type ThunkAction = ReduxThunkAction<void, State, ExtraArgument, Action>;
 export type ThunkDispatch = ReduxThunkDispatch<State, ExtraArgument, Action>;
 
-export const readPost = (id: number): ThunkAction => (
+export const readPost = (id: number): ThunkAction => async (
   dispatch: ThunkDispatch,
   getState: () => State,
   { api }: ExtraArgument
-): void => {
+): Promise<void> => {
   dispatch({
     meta: {
       status: Status.Request,
@@ -72,49 +71,48 @@ export const readPost = (id: number): ThunkAction => (
     type: ActionType.ReadPost,
   });
 
-  axios({
-    method: 'get',
-    url: `${api}/item/${id}.json`,
-  })
-    .then(property<unknown, unknown>('data'))
-    .then(({ by, id, kids, score, time, title, url }) => {
-      kids;
-
-      dispatch({
-        meta: {
-          status: Status.Success,
-        },
-        payload: {
-          post: {
-            comments: [],
-            createdAt: fromUnixTime(time),
-            createdBy: by,
-            id,
-            score,
-            title,
-            url,
-          },
-        },
-        type: ActionType.ReadPost,
-      });
-    })
-    .catch(() => {
-      dispatch({
-        meta: {
-          status: Status.Error,
-        },
-        type: ActionType.ReadPost,
-      });
+  try {
+    const {
+      data: { by, kids, score, time, title, url },
+    } = await axios({
+      method: 'get',
+      url: `${api}/item/${id}.json`,
     });
+
+    dispatch({
+      meta: {
+        status: Status.Success,
+      },
+      payload: {
+        post: {
+          comments: [],
+          createdAt: fromUnixTime(time),
+          createdBy: by,
+          id,
+          score,
+          title,
+          url,
+        },
+      },
+      type: ActionType.ReadPost,
+    });
+  } catch {
+    dispatch({
+      meta: {
+        status: Status.Error,
+      },
+      type: ActionType.ReadPost,
+    });
+  }
 };
 
-export const readPosts = (page: number): ThunkAction => (
+export const readPosts = (page: number): ThunkAction => async (
   dispatch: ThunkDispatch,
   getState: () => State,
   { api }: ExtraArgument
-): void => {
+): Promise<void> => {
   const { perPage } = getState();
-  let count: number;
+  const offset: number = (page - 1) * perPage;
 
   dispatch({
     meta: {
@@ -126,56 +124,49 @@ export const readPosts = (page: number): ThunkAction => (
     type: ActionType.ReadPosts,
   });
 
-  axios({
-    method: 'get',
-    url: `${api}/topstories.json`,
-  })
-    .then(property<unknown, number[]>('data'))
-    .then((ids: number[]) => {
-      count = ids.length;
-
-      return take(drop(ids, page * perPage), perPage);
-    })
-    .then((ids: number[]) =>
-      ids.map(
-        (id): AxiosPromise<unknown> =>
-          axios({
-            method: 'get',
-            url: `${api}/item/${id}.json`,
-          })
-      )
-    )
-    .then(axios.all)
-    .then((responses: unknown[]): void => {
-      const posts: Partial<Post>[] = responses
-        .map(property('data'))
-        .map(({ by, id, score, time, title }) => ({
-          createdAt: fromUnixTime(time),
-          createdBy: by,
-          id,
-          score,
-          title,
-        }));
-
-      dispatch({
-        meta: {
-          status: Status.Success,
-        },
-        payload: {
-          count,
-          posts,
-        },
-        type: ActionType.ReadPosts,
-      });
-    })
-    .catch(() => {
-      dispatch({
-        meta: {
-          status: Status.Error,
-        },
-        type: ActionType.ReadPosts,
-      });
+  try {
+    const { data } = await axios({
+      method: 'get',
+      url: `${api}/topstories.json`,
     });
+    const count: number = data.length;
+    const ids: number[] = data.slice(offset, offset + perPage);
+    const responses: AxiosResponse[] = await axios.all(
+      ids.map((id) =>
+        axios({
+          method: 'get',
+          url: `${api}/item/${id}.json`,
+        })
+      )
+    );
+    const posts: Partial<Post>[] = responses
+      .map(({ data }) => data)
+      .map(({ by, id, score, time, title }) => ({
+        createdAt: fromUnixTime(time),
+        createdBy: by,
+        id,
+        score,
+        title,
+      }));
+
+    dispatch({
+      meta: {
+        status: Status.Success,
+      },
+      payload: {
+        count,
+        posts,
+      },
+      type: ActionType.ReadPosts,
+    });
+  } catch {
+    dispatch({
+      meta: {
+        status: Status.Error,
+      },
+      type: ActionType.ReadPosts,
+    });
+  }
 };
 
 export const updateLocation = (location: Location): ThunkAction => (

@@ -6,7 +6,6 @@ import {
 } from '@material-ui/core';
 import Comment from 'components/Comment';
 import Subtitle from 'components/Subtitle';
-import { find, matchesProperty } from 'lodash-es';
 import React, { FunctionComponent, ReactElement, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { readPost } from 'store/actions';
@@ -78,7 +77,7 @@ export const Post: FunctionComponent<PostProps> = ({
 
 export default connect(
   (state: State, { id }: Partial<PostProps>) => {
-    const post: PostType = find(state.posts, matchesProperty('id', id));
+    const post: Partial<PostType> = state.posts.find((post) => post.id === id);
 
     return {
       comments: post?.comments ?? [],

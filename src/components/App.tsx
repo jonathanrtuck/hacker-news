@@ -1,7 +1,6 @@
 import Header from 'components/Header';
 import Listing from 'components/Listing';
 import Post from 'components/Post';
-import { find, matchesProperty } from 'lodash-es';
 import { match } from 'path-to-regexp';
 import React, { Fragment, FunctionComponent, ReactElement } from 'react';
 import { connect } from 'react-redux';
@@ -47,7 +46,7 @@ export default connect((state: State) => {
 
   if (postMatch) {
     const id: number = parseInt(postMatch.params.id, 10);
-    const post: PostType = find(state.posts, matchesProperty('id', id));
+    const post: Partial<PostType> = state.posts.find((post) => post.id === id);
 
     return {
       id,
