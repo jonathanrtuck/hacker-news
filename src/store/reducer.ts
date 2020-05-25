@@ -59,7 +59,7 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
           return state;
       }
 
-    case ActionType.UpdateLocation:
+    case ActionType.UpdateView:
       return {
         ...state,
         ...action.payload,

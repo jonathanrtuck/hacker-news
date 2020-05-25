@@ -6,19 +6,19 @@ import {
   ThunkAction as ReduxThunkAction,
   ThunkDispatch as ReduxThunkDispatch,
 } from 'redux-thunk';
-import { ExtraArgument } from 'store/extra-argument';
+import EXTRA_ARGUMENT from 'store/extra-argument';
 import { Comment, Post, State } from 'store/state';
 
 export enum ActionType {
   ReadPost = 'READ_POST',
   ReadPosts = 'READ_POSTS',
-  UpdateLocation = 'UPDATE_LOCATION',
+  UpdateView = 'UPDATE_VIEW',
 }
 
 export enum Status {
-  Error = 'ERROR',
-  Request = 'REQUEST',
-  Success = 'SUCCESS',
+  Error,
+  Request,
+  Success,
 }
 
 export interface Meta {
@@ -41,20 +41,29 @@ export interface PostsReadAction extends ReduxAction<ActionType> {
   type: ActionType.ReadPosts;
 }
 
-export interface UrlUpdateAction extends ReduxAction<ActionType> {
+export interface ViewUpdateAction extends ReduxAction<ActionType> {
   payload?: Pick<State, 'page' | 'view'>;
-  type: ActionType.UpdateLocation;
+  type: ActionType.UpdateView;
 }
 
-export type Action = PostReadAction | PostsReadAction | UrlUpdateAction;
+export type Action = PostReadAction | PostsReadAction | ViewUpdateAction;
 
-export type ThunkAction = ReduxThunkAction<void, State, ExtraArgument, Action>;
-export type ThunkDispatch = ReduxThunkDispatch<State, ExtraArgument, Action>;
+export type ThunkAction = ReduxThunkAction<
+  void,
+  State,
+  typeof EXTRA_ARGUMENT,
+  Action
+>;
+export type ThunkDispatch = ReduxThunkDispatch<
+  State,
+  typeof EXTRA_ARGUMENT,
+  Action
+>;
 
 export const readPost = (id: number): ThunkAction => async (
   dispatch: ThunkDispatch,
   getState: () => State,
-  { api }: ExtraArgument
+  { api }: typeof EXTRA_ARGUMENT
 ): Promise<void> => {
   // recursive
   const getComments = async (ids: number[]): Promise<Comment[]> => {
@@ -144,7 +153,7 @@ export const readPost = (id: number): ThunkAction => async (
 export const readPosts = (index: number): ThunkAction => async (
   dispatch: ThunkDispatch,
   getState: () => State,
-  { api }: ExtraArgument
+  { api }: typeof EXTRA_ARGUMENT
 ): Promise<void> => {
   const {
     page: { size: pageSize },
@@ -210,7 +219,7 @@ export const readPosts = (index: number): ThunkAction => async (
   }
 };
 
-export const updateLocation = (pathname: string): ThunkAction => (
+export const updateView = (pathname: string): ThunkAction => (
   dispatch: ThunkDispatch,
   getState: () => State
 ): void => {
@@ -229,7 +238,7 @@ export const updateLocation = (pathname: string): ThunkAction => (
         },
         view: [],
       },
-      type: ActionType.UpdateLocation,
+      type: ActionType.UpdateView,
     });
   }
 
@@ -243,7 +252,7 @@ export const updateLocation = (pathname: string): ThunkAction => (
         page,
         view: id,
       },
-      type: ActionType.UpdateLocation,
+      type: ActionType.UpdateView,
     });
   }
 };

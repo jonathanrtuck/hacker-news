@@ -19,23 +19,17 @@ const mapStateToProps = (state: State): Partial<AppProps> => {
     };
   }
 
-  const post = state.posts.items.find(({ id }) => id === state.view);
-
   return {
     id: state.view,
-    shouldShowBackButton: true,
-    title: post?.title,
   };
 };
 
 export const App: FunctionComponent<AppProps> = ({
   id,
   index,
-  shouldShowBackButton,
-  title,
 }: AppProps): ReactElement => (
   <Fragment>
-    <Header shouldShowBackButton={shouldShowBackButton} title={title} />
+    <Header />
     {Number.isInteger(index) && <Listing index={index} />}
     {Number.isInteger(id) && <Post id={id} />}
   </Fragment>

@@ -6,9 +6,10 @@ import {
   ListItemIcon,
   ListItemText,
   makeStyles,
+  Snackbar,
   Typography,
 } from '@material-ui/core';
-import { ChevronLeft, ChevronRight } from '@material-ui/icons';
+import { ChevronLeft, ChevronRight, Error } from '@material-ui/icons';
 import Subtitle from 'components/Subtitle';
 import React, {
   Fragment,
@@ -78,10 +79,17 @@ export const Listing: FunctionComponent<ListingProps> = ({
   }
 
   if (isError) {
-    /**
-     * @todo
-     */
-    return <h1>error…</h1>;
+    return (
+      <Snackbar
+        anchorOrigin={{
+          horizontal: 'left',
+          vertical: 'bottom',
+        }}
+        open
+      >
+        <Error color="secondary" fontSize="large" />
+      </Snackbar>
+    );
   }
 
   return (

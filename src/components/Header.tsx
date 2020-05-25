@@ -7,12 +7,29 @@ import {
 } from '@material-ui/core';
 import { ArrowBack } from '@material-ui/icons';
 import React, { FunctionComponent, MouseEvent, ReactElement } from 'react';
+import { connect } from 'react-redux';
+import { State } from 'store/state';
 import { navigateTo } from 'utils/history';
 
 interface HeaderProps {
-  shouldShowBackButton?: boolean;
+  shouldShowBackButton: boolean;
   title?: string;
 }
+
+const mapStateToProps = (state: State): Partial<HeaderProps> => {
+  if (Array.isArray(state.view)) {
+    return {
+      shouldShowBackButton: false,
+    };
+  }
+
+  const post = state.posts.items.find(({ id }) => id === state.view);
+
+  return {
+    shouldShowBackButton: true,
+    title: post?.title,
+  };
+};
 
 const useStyles = makeStyles((theme) => ({
   arrow: {
@@ -53,4 +70,4 @@ export const Header: FunctionComponent<HeaderProps> = ({
   );
 };
 
-export default Header;
+export default connect(mapStateToProps)(Header);

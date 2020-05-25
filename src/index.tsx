@@ -5,17 +5,13 @@ import React, { Fragment } from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import store from 'store';
-import { updateLocation } from 'store/actions';
+import { updateView } from 'store/actions';
 import history from 'utils/history';
 
-store.subscribe((): void => {
-  console.debug('state', store.getState());
-});
-
-store.dispatch(updateLocation(history.location.pathname));
+store.dispatch(updateView(history.location.pathname));
 
 history.listen(({ pathname }: Location): void => {
-  store.dispatch(updateLocation(pathname));
+  store.dispatch(updateView(pathname));
 });
 
 render(
@@ -25,5 +21,5 @@ render(
       <App />
     </Provider>
   </Fragment>,
-  document.getElementById('root')
+  document.getElementById('app')
 );

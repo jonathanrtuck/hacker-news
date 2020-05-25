@@ -2,8 +2,10 @@ import {
   LinearProgress,
   List,
   makeStyles,
+  Snackbar,
   Typography,
 } from '@material-ui/core';
+import { Error } from '@material-ui/icons';
 import Comment from 'components/Comment';
 import Subtitle from 'components/Subtitle';
 import React, { FunctionComponent, ReactElement, useEffect } from 'react';
@@ -73,10 +75,17 @@ export const Post: FunctionComponent<PostProps> = ({
   }
 
   if (isError) {
-    /**
-     * @todo
-     */
-    return <h1>error…</h1>;
+    return (
+      <Snackbar
+        anchorOrigin={{
+          horizontal: 'left',
+          vertical: 'bottom',
+        }}
+        open
+      >
+        <Error color="secondary" fontSize="large" />
+      </Snackbar>
+    );
   }
 
   return (
