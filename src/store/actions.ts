@@ -1,249 +1,135 @@
-import axios, { AxiosResponse } from 'axios';
-import { fromUnixTime } from 'date-fns';
+import getPost from 'api/getPost';
+import getPosts from 'api/getPosts';
 import { match } from 'path-to-regexp';
 import { Action as ReduxAction } from 'redux';
 import {
   ThunkAction as ReduxThunkAction,
   ThunkDispatch as ReduxThunkDispatch,
 } from 'redux-thunk';
-import { ExtraArgument } from 'store/extra-argument';
-import { Comment, Post, State } from 'store/state';
+import { Post, Posts, State } from 'store/state';
 
 export enum ActionType {
-  ReadPost = 'READ_POST',
-  ReadPosts = 'READ_POSTS',
-  UpdateView = 'UPDATE_VIEW',
+  UpdateState = 'UPDATE_STATE',
 }
 
-export enum Status {
-  Error,
-  Request,
-  Success,
+interface StateUpdateAction extends ReduxAction<ActionType> {
+  payload?: State;
+  type: ActionType.UpdateState;
 }
 
-export interface Meta {
-  status: Status;
-}
+export type Action = StateUpdateAction;
 
-export interface PostReadAction extends ReduxAction<ActionType> {
-  meta: Meta & {
-    id: number;
-  };
-  payload?: Pick<State, 'posts'>;
-  type: ActionType.ReadPost;
-}
+export type ThunkAction = ReduxThunkAction<void, State, undefined, Action>;
+export type ThunkDispatch = ReduxThunkDispatch<State, undefined, Action>;
 
-export interface PostsReadAction extends ReduxAction<ActionType> {
-  meta: Meta & {
-    index: number;
-  };
-  payload?: Pick<State, 'posts'>;
-  type: ActionType.ReadPosts;
-}
-
-export interface ViewUpdateAction extends ReduxAction<ActionType> {
-  payload?: Pick<State, 'page' | 'view'>;
-  type: ActionType.UpdateView;
-}
-
-export type Action = PostReadAction | PostsReadAction | ViewUpdateAction;
-
-export type ThunkAction = ReduxThunkAction<void, State, ExtraArgument, Action>;
-export type ThunkDispatch = ReduxThunkDispatch<State, ExtraArgument, Action>;
-
-export const readPost = (id: number): ThunkAction => async (
-  dispatch: ThunkDispatch,
-  getState: () => State,
-  { api }: ExtraArgument
-): Promise<void> => {
-  // recursive
-  const getComments = async (ids: number[]): Promise<Comment[]> => {
-    if (Array.isArray(ids) && ids.length !== 0) {
-      const responses: AxiosResponse[] = await axios.all(
-        ids.map((id) =>
-          axios({
-            method: 'get',
-            url: `${api}/item/${id}.json`,
-          })
-        )
-      );
-      const comments: Comment[] = await Promise.all(
-        responses
-          .map(({ data }) => data)
-          .map(async ({ by, deleted, id, kids, text, time }) => {
-            const comments: Comment[] = await getComments(kids);
-
-            return {
-              comments,
-              content: text,
-              createdAt: fromUnixTime(time),
-              createdBy: by,
-              id,
-              isDeleted: deleted,
-            };
-          })
-      );
-
-      return comments;
-    }
-
-    return [];
-  };
-
-  dispatch({
-    meta: {
-      id,
-      status: Status.Request,
-    },
-    type: ActionType.ReadPost,
-  });
-
-  try {
-    const {
-      data: { by, kids, score, time, title, url },
-    } = await axios({
-      method: 'get',
-      url: `${api}/item/${id}.json`,
-    });
-    const comments: Comment[] = await getComments(kids);
-
-    dispatch({
-      meta: {
-        id,
-        status: Status.Success,
-      },
-      payload: {
-        posts: {
-          items: [
-            {
-              comments,
-              createdAt: fromUnixTime(time),
-              createdBy: by,
-              id,
-              score,
-              title,
-              url,
-            },
-          ],
-          size: undefined,
-        },
-      },
-      type: ActionType.ReadPost,
-    });
-  } catch {
-    dispatch({
-      meta: {
-        id,
-        status: Status.Error,
-      },
-      type: ActionType.ReadPost,
-    });
-  }
-};
-
-export const readPosts = (index: number): ThunkAction => async (
-  dispatch: ThunkDispatch,
-  getState: () => State,
-  { api }: ExtraArgument
-): Promise<void> => {
-  const {
-    page: { size: pageSize },
-  } = getState();
-  const offset: number = index * pageSize;
-
-  dispatch({
-    meta: {
-      index,
-      status: Status.Request,
-    },
-    type: ActionType.ReadPosts,
-  });
-
-  try {
-    const { data } = await axios({
-      method: 'get',
-      url: `${api}/topstories.json`,
-    });
-    const itemsSize: number = data.length;
-    const ids: number[] = data.slice(offset, offset + pageSize);
-    const responses: AxiosResponse[] = await axios.all(
-      ids.map((id) =>
-        axios({
-          method: 'get',
-          url: `${api}/item/${id}.json`,
-        })
-      )
-    );
-    const posts: Post[] = responses
-      .map(({ data }) => data)
-      .map(({ by, id, score, time, title, url }) => ({
-        comments: undefined,
-        createdAt: fromUnixTime(time),
-        createdBy: by,
-        id,
-        score,
-        title,
-        url,
-      }));
-
-    dispatch({
-      meta: {
-        index,
-        status: Status.Success,
-      },
-      payload: {
-        posts: {
-          items: posts,
-          size: itemsSize,
-        },
-      },
-      type: ActionType.ReadPosts,
-    });
-  } catch {
-    dispatch({
-      meta: {
-        index,
-        status: Status.Error,
-      },
-      type: ActionType.ReadPosts,
-    });
-  }
-};
-
-export const updateView = (pathname: string): ThunkAction => (
+const readPost = (id: number) => async (
   dispatch: ThunkDispatch,
   getState: () => State
-): void => {
-  const { page } = getState();
+): Promise<void> => {
+  const state = getState();
 
-  const listingMatch = match<{ index: string }>('/:index(\\d+)?')(pathname);
+  dispatch({
+    payload: {
+      ...state,
+      isBusy: true,
+      isError: false,
+      view: id,
+    },
+    type: ActionType.UpdateState,
+  });
 
-  if (listingMatch) {
-    const pageNum: number = parseInt(listingMatch.params.index, 10);
+  try {
+    const post: Post = await getPost(id);
+    const state = getState();
 
     dispatch({
       payload: {
-        page: {
-          ...page,
-          index: Number.isNaN(pageNum) ? 0 : pageNum - 1,
+        ...state,
+        isBusy: false,
+        posts: {
+          ...state.posts,
+          items: [post],
         },
-        view: [],
       },
-      type: ActionType.UpdateView,
+      type: ActionType.UpdateState,
+    });
+  } catch {
+    dispatch({
+      payload: {
+        ...state,
+        isBusy: false,
+        isError: true,
+      },
+      type: ActionType.UpdateState,
     });
   }
+};
 
-  const postMatch = match<{ id: string }>('/post/:id(\\d+)?')(pathname);
+const readPosts = (index: number) => async (
+  dispatch: ThunkDispatch,
+  getState: () => State
+): Promise<void> => {
+  const state = getState();
+  const first: number = state.page.size;
+  const offset: number = index * state.page.size;
 
-  if (postMatch) {
-    const id: number = parseInt(postMatch.params.id, 10);
+  dispatch({
+    payload: {
+      ...state,
+      isBusy: true,
+      isError: false,
+      page: {
+        ...state.page,
+        index,
+      },
+      view: [],
+    },
+    type: ActionType.UpdateState,
+  });
+
+  try {
+    const posts: Posts = await getPosts({
+      first,
+      offset,
+    });
+    const state = getState();
 
     dispatch({
       payload: {
-        page,
-        view: id,
+        ...state,
+        isBusy: false,
+        posts,
+        view: posts.items.map(({ id }) => id),
       },
-      type: ActionType.UpdateView,
+      type: ActionType.UpdateState,
     });
+  } catch {
+    dispatch({
+      payload: {
+        ...state,
+        isBusy: false,
+        isError: true,
+      },
+      type: ActionType.UpdateState,
+    });
+  }
+};
+
+export const updatePathname = (pathname: string): ThunkAction => {
+  const listing = match<{ index: string }>('/:index(\\d+)?')(pathname);
+
+  if (listing) {
+    const pageNum: number = parseInt(listing.params.index, 10);
+    const index: number = Number.isNaN(pageNum) ? 0 : pageNum - 1;
+
+    return readPosts(index);
+  }
+
+  const post = match<{ id: string }>('/post/:id(\\d+)?')(pathname);
+
+  if (post) {
+    const id: number = parseInt(post.params.id, 10);
+
+    return readPost(id);
   }
 };

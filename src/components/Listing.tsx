@@ -16,10 +16,8 @@ import React, {
   FunctionComponent,
   MouseEvent,
   ReactElement,
-  useEffect,
 } from 'react';
 import { connect } from 'react-redux';
-import { readPosts } from 'store/actions';
 import { Post, State } from 'store/state';
 import { navigateTo } from 'utils/history';
 
@@ -31,7 +29,6 @@ interface ListingProps {
   isFirstPage: boolean;
   isLastPage: boolean;
   posts: Post[];
-  readPosts: typeof readPosts;
 }
 
 const mapStateToProps = (
@@ -47,8 +44,6 @@ const mapStateToProps = (
     ? state.view.map((id) => state.posts.items.find((post) => post.id === id))
     : [],
 });
-
-const mapDispatchToProps = { readPosts };
 
 const useStyles = makeStyles((theme) => ({
   arrow: {
@@ -68,13 +63,8 @@ export const Listing: FunctionComponent<ListingProps> = ({
   isFirstPage,
   isLastPage,
   posts,
-  readPosts,
 }: ListingProps): ReactElement => {
   const classes = useStyles();
-
-  useEffect(() => {
-    readPosts(index);
-  }, [index, readPosts]);
 
   if (isBusy) {
     return <LinearProgress />;
@@ -161,4 +151,4 @@ export const Listing: FunctionComponent<ListingProps> = ({
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Listing);
+export default connect(mapStateToProps)(Listing);

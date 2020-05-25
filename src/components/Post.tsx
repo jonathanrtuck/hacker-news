@@ -8,9 +8,8 @@ import {
 import { Error } from '@material-ui/icons';
 import Comment from 'components/Comment';
 import Subtitle from 'components/Subtitle';
-import React, { FunctionComponent, ReactElement, useEffect } from 'react';
+import React, { FunctionComponent, ReactElement } from 'react';
 import { connect } from 'react-redux';
-import { readPost } from 'store/actions';
 import { Comment as CommentType, State } from 'store/state';
 
 interface PostProps {
@@ -20,7 +19,6 @@ interface PostProps {
   id: number;
   isBusy: boolean;
   isError: boolean;
-  readPost: typeof readPost;
   score: number;
   url: string;
 }
@@ -42,8 +40,6 @@ const mapStateToProps = (
   };
 };
 
-const mapDispatchToProps = { readPost };
-
 const useStyles = makeStyles((theme) => ({
   comments: {
     marginTop: theme.spacing(2),
@@ -60,15 +56,10 @@ export const Post: FunctionComponent<PostProps> = ({
   id,
   isBusy,
   isError,
-  readPost,
   score,
   url,
 }: PostProps): ReactElement => {
   const classes = useStyles();
-
-  useEffect(() => {
-    readPost(id);
-  }, [id, readPost]);
 
   if (isBusy) {
     return <LinearProgress />;
@@ -130,4 +121,4 @@ export const Post: FunctionComponent<PostProps> = ({
   );
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Post);
+export default connect(mapStateToProps)(Post);

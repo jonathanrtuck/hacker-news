@@ -5,13 +5,13 @@ import React, { Fragment } from 'react';
 import { render } from 'react-dom';
 import { Provider } from 'react-redux';
 import store from 'store';
-import { updateView } from 'store/actions';
+import { updatePathname } from 'store/actions';
 import history from 'utils/history';
 
-store.dispatch(updateView(history.location.pathname));
+store.dispatch(updatePathname(history.location.pathname));
 
 history.listen(({ pathname }: Location): void => {
-  store.dispatch(updateView(pathname));
+  store.dispatch(updatePathname(pathname));
 });
 
 render(
