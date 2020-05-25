@@ -9,16 +9,16 @@ import { ArrowBack } from '@material-ui/icons';
 import React, { FunctionComponent, MouseEvent, ReactElement } from 'react';
 import { navigateTo } from 'utils/history';
 
+interface HeaderProps {
+  shouldShowBackButton?: boolean;
+  title?: string;
+}
+
 const useStyles = makeStyles((theme) => ({
   arrow: {
     marginRight: theme.spacing(1),
   },
 }));
-
-interface HeaderProps {
-  shouldShowBackButton?: boolean;
-  title?: string;
-}
 
 export const Header: FunctionComponent<HeaderProps> = ({
   shouldShowBackButton,

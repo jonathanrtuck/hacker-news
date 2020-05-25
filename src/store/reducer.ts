@@ -17,14 +17,14 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
             ...state,
             isBusy: true,
             isError: false,
-            posts: [],
+            view: action.meta.id,
           };
 
         case Status.Success:
           return {
             ...state,
+            ...action.payload,
             isBusy: false,
-            posts: [action.payload.post],
           };
 
         default:
@@ -43,18 +43,16 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
         case Status.Request:
           return {
             ...state,
-            count: 0,
             isBusy: true,
             isError: false,
-            posts: [],
+            view: [],
           };
 
         case Status.Success:
           return {
             ...state,
-            count: action.payload.count,
+            ...action.payload,
             isBusy: false,
-            posts: action.payload.posts,
           };
 
         default:
@@ -64,7 +62,7 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
     case ActionType.UpdateLocation:
       return {
         ...state,
-        location: action.payload.location,
+        ...action.payload,
       };
 
     default:

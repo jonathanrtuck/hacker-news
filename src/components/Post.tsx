@@ -9,16 +9,7 @@ import Subtitle from 'components/Subtitle';
 import React, { FunctionComponent, ReactElement, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { readPost } from 'store/actions';
-import { Comment as CommentType, Post as PostType, State } from 'store/state';
-
-const useStyles = makeStyles((theme) => ({
-  comments: {
-    marginTop: theme.spacing(2),
-  },
-  root: {
-    padding: theme.spacing(2),
-  },
-}));
+import { Comment as CommentType, State } from 'store/state';
 
 interface PostProps {
   comments: CommentType[];
@@ -31,6 +22,34 @@ interface PostProps {
   score: number;
   url: string;
 }
+
+const mapStateToProps = (
+  state: State,
+  { id }: Partial<PostProps>
+): Partial<PostProps> => {
+  const post = state.posts.items.find((post) => post.id === id);
+
+  return {
+    comments: post?.comments ?? [],
+    createdAt: post?.createdAt,
+    createdBy: post?.createdBy,
+    isBusy: state.isBusy,
+    isError: state.isError,
+    score: post?.score,
+    url: post?.url,
+  };
+};
+
+const mapDispatchToProps = { readPost };
+
+const useStyles = makeStyles((theme) => ({
+  comments: {
+    marginTop: theme.spacing(2),
+  },
+  root: {
+    padding: theme.spacing(2),
+  },
+}));
 
 export const Post: FunctionComponent<PostProps> = ({
   comments,
@@ -85,7 +104,7 @@ export const Post: FunctionComponent<PostProps> = ({
             createdBy,
             id,
             isDeleted,
-          }: CommentType): ReactElement => (
+          }): ReactElement => (
             <Comment
               comments={comments}
               content={content}
@@ -102,21 +121,4 @@ export const Post: FunctionComponent<PostProps> = ({
   );
 };
 
-export default connect(
-  (state: State, { id }: Partial<PostProps>) => {
-    const post: Partial<PostType> = state.posts.find((post) => post.id === id);
-
-    return {
-      comments: post?.comments ?? [],
-      createdAt: post?.createdAt,
-      createdBy: post?.createdBy,
-      isBusy: state.isBusy,
-      isError: state.isError,
-      score: post?.score,
-      url: post?.url,
-    };
-  },
-  {
-    readPost,
-  }
-)(Post);
+export default connect(mapStateToProps, mapDispatchToProps)(Post);

@@ -12,10 +12,10 @@ store.subscribe((): void => {
   console.debug('state', store.getState());
 });
 
-store.dispatch(updateLocation(history.location));
+store.dispatch(updateLocation(history.location.pathname));
 
-history.listen((location: Location): void => {
-  store.dispatch(updateLocation(location));
+history.listen(({ pathname }: Location): void => {
+  store.dispatch(updateLocation(pathname));
 });
 
 render(

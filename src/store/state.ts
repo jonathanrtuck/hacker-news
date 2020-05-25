@@ -1,5 +1,3 @@
-import { Location } from 'history';
-
 export interface Comment {
   comments: Comment[];
   content: string;
@@ -7,6 +5,11 @@ export interface Comment {
   createdBy: string;
   id: number;
   isDeleted?: boolean;
+}
+
+export interface Page {
+  index: number;
+  size: number;
 }
 
 export interface Post {
@@ -19,20 +22,29 @@ export interface Post {
   url: string;
 }
 
+export interface Posts {
+  items: Post[];
+  size: number;
+}
+
 export interface State {
-  count: number;
   isBusy: boolean;
   isError: boolean;
-  location: Location;
-  perPage: number;
-  posts: Partial<Post>[];
+  page: Page;
+  posts: Posts;
+  view: number | number[];
 }
 
 export const INITIAL_STATE: State = {
-  count: 0,
   isBusy: false,
   isError: false,
-  location: undefined,
-  perPage: 20,
-  posts: [],
+  page: {
+    index: 0,
+    size: 20,
+  },
+  posts: {
+    items: [],
+    size: undefined,
+  },
+  view: [],
 };

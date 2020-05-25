@@ -22,6 +22,31 @@ import { readPosts } from 'store/actions';
 import { Post, State } from 'store/state';
 import { navigateTo } from 'utils/history';
 
+interface ListingProps {
+  index: number;
+  indexOffset: number;
+  isBusy: boolean;
+  isError: boolean;
+  isFirstPage: boolean;
+  isLastPage: boolean;
+  posts: Post[];
+  readPosts: typeof readPosts;
+}
+
+const mapStateToProps = (
+  state: State,
+  { index }: Partial<ListingProps>
+): Partial<ListingProps> => ({
+  indexOffset: index * state.page.size,
+  isBusy: state.isBusy,
+  isError: state.isError,
+  isFirstPage: index === 0,
+  isLastPage: index === Math.ceil(state.posts.size / state.page.size),
+  posts: state.posts.items,
+});
+
+const mapDispatchToProps = { readPosts };
+
 const useStyles = makeStyles((theme) => ({
   arrow: {
     margin: theme.spacing(1),
@@ -32,32 +57,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-interface ListingProps {
-  indexOffset: number;
-  isBusy: boolean;
-  isError: boolean;
-  isFirstPage: boolean;
-  isLastPage: boolean;
-  page: number;
-  posts: Post[];
-  readPosts: typeof readPosts;
-}
-
 export const Listing: FunctionComponent<ListingProps> = ({
+  index,
   indexOffset,
   isBusy,
   isError,
   isFirstPage,
   isLastPage,
-  page,
   posts,
   readPosts,
 }: ListingProps): ReactElement => {
   const classes = useStyles();
 
   useEffect(() => {
-    readPosts(page);
-  }, [page]);
+    readPosts(index);
+  }, [index]);
 
   if (isBusy) {
     return <LinearProgress />;
@@ -115,7 +129,7 @@ export const Listing: FunctionComponent<ListingProps> = ({
           disabled={isFirstPage}
           onClick={(): void => {
             navigateTo({
-              pathname: `/${page === 2 ? '' : page - 1}`,
+              pathname: `/${index === 1 ? '' : index}`,
             });
           }}
         >
@@ -126,7 +140,7 @@ export const Listing: FunctionComponent<ListingProps> = ({
           disabled={isLastPage}
           onClick={(): void => {
             navigateTo({
-              pathname: `/${page + 1}`,
+              pathname: `/${index + 2}`,
             });
           }}
         >
@@ -137,16 +151,4 @@ export const Listing: FunctionComponent<ListingProps> = ({
   );
 };
 
-export default connect(
-  (state: State, { page }: Partial<ListingProps>) => ({
-    indexOffset: (page - 1) * state.perPage,
-    isBusy: state.isBusy,
-    isError: state.isError,
-    isFirstPage: page === 1,
-    isLastPage: page === Math.ceil(state.count / state.perPage),
-    posts: state.posts,
-  }),
-  {
-    readPosts,
-  }
-)(Listing);
+export default connect(mapStateToProps, mapDispatchToProps)(Listing);
