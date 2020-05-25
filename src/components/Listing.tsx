@@ -43,7 +43,9 @@ const mapStateToProps = (
   isError: state.isError,
   isFirstPage: index === 0,
   isLastPage: index === Math.ceil(state.posts.size / state.page.size),
-  posts: state.posts.items,
+  posts: Array.isArray(state.view)
+    ? state.view.map((id) => state.posts.items.find((post) => post.id === id))
+    : [],
 });
 
 const mapDispatchToProps = { readPosts };

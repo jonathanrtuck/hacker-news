@@ -53,6 +53,7 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
             ...state,
             ...action.payload,
             isBusy: false,
+            view: action.payload.posts.items.map(({ id }) => id),
           };
 
         default:
