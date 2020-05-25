@@ -6,7 +6,7 @@ import {
   ThunkAction as ReduxThunkAction,
   ThunkDispatch as ReduxThunkDispatch,
 } from 'redux-thunk';
-import EXTRA_ARGUMENT from 'store/extra-argument';
+import { ExtraArgument } from 'store/extra-argument';
 import { Comment, Post, State } from 'store/state';
 
 export enum ActionType {
@@ -48,22 +48,13 @@ export interface ViewUpdateAction extends ReduxAction<ActionType> {
 
 export type Action = PostReadAction | PostsReadAction | ViewUpdateAction;
 
-export type ThunkAction = ReduxThunkAction<
-  void,
-  State,
-  typeof EXTRA_ARGUMENT,
-  Action
->;
-export type ThunkDispatch = ReduxThunkDispatch<
-  State,
-  typeof EXTRA_ARGUMENT,
-  Action
->;
+export type ThunkAction = ReduxThunkAction<void, State, ExtraArgument, Action>;
+export type ThunkDispatch = ReduxThunkDispatch<State, ExtraArgument, Action>;
 
 export const readPost = (id: number): ThunkAction => async (
   dispatch: ThunkDispatch,
   getState: () => State,
-  { api }: typeof EXTRA_ARGUMENT
+  { api }: ExtraArgument
 ): Promise<void> => {
   // recursive
   const getComments = async (ids: number[]): Promise<Comment[]> => {
@@ -153,7 +144,7 @@ export const readPost = (id: number): ThunkAction => async (
 export const readPosts = (index: number): ThunkAction => async (
   dispatch: ThunkDispatch,
   getState: () => State,
-  { api }: typeof EXTRA_ARGUMENT
+  { api }: ExtraArgument
 ): Promise<void> => {
   const {
     page: { size: pageSize },
