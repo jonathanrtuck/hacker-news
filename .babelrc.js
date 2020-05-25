@@ -1,15 +1,10 @@
 module.exports = {
-  plugins: [
-    '@babel/plugin-proposal-object-rest-spread',
-    '@babel/plugin-proposal-class-properties',
-  ],
+  plugins: ['@babel/plugin-proposal-object-rest-spread'],
   presets: [
     [
       '@babel/env',
       {
-        targets: {
-          browsers: ['last 2 versions', 'not ie 10', 'not < 1%'],
-        },
+        corejs: 3,
         useBuiltIns: 'usage',
       },
     ],

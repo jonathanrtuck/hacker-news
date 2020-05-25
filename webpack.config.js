@@ -12,15 +12,25 @@ module.exports = (env, { mode }) => {
       contentBase: path.resolve(__dirname, 'dist'),
       historyApiFallback: true,
     },
-    entry: 'index.jsx',
+    devtool: 'source-map',
+    entry: 'index.tsx',
+    infrastructureLogging: {
+      level: 'verbose',
+    },
     module: {
       rules: [
         {
           exclude: [/node_modules/],
           include: path.resolve('src'),
-          test: /\.(js|jsx)$/,
+          test: /\.jsx?$/,
           use: {
             loader: 'babel-loader',
+          },
+        },
+        {
+          test: /\.tsx?$/,
+          use: {
+            loader: 'ts-loader',
           },
         },
       ],
@@ -48,7 +58,7 @@ module.exports = (env, { mode }) => {
       }),
     ],
     resolve: {
-      extensions: ['.js', '.jsx'],
+      extensions: ['.js', '.ts', '.tsx'],
       modules: [path.resolve('src'), 'node_modules'],
     },
   };
