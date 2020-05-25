@@ -5,7 +5,7 @@ import { find, matchesProperty } from 'lodash-es';
 import { match } from 'path-to-regexp';
 import React, { Fragment, FunctionComponent, ReactElement } from 'react';
 import { connect } from 'react-redux';
-import { State } from 'store/state';
+import { Post as PostType, State } from 'store/state';
 
 interface AppProps {
   id?: number;
@@ -28,29 +28,31 @@ export const App: FunctionComponent<AppProps> = ({
 );
 
 export default connect((state: State) => {
-  const list = match<{ index: string }>('/:index(\\d+)?')(
-    state.location?.pathname
-  );
-  const post = match<{ id: string }>('/post/:id(\\d+)?')(
+  const listingMatch = match<{ index: string }>('/:index(\\d+)?')(
     state.location?.pathname
   );
 
-  if (list) {
-    const index = parseInt(list.params.index, 10);
-    const page = isNaN(index) ? 1 : index;
+  if (listingMatch) {
+    const index: number = parseInt(listingMatch.params.index, 10);
+    const page: number = isNaN(index) ? 1 : index;
 
     return {
       page,
     };
   }
 
-  if (post) {
-    const id = parseInt(post.params.id, 10);
+  const postMatch = match<{ id: string }>('/post/:id(\\d+)?')(
+    state.location?.pathname
+  );
+
+  if (postMatch) {
+    const id: number = parseInt(postMatch.params.id, 10);
+    const post: PostType = find(state.posts, matchesProperty('id', id));
 
     return {
       id,
       shouldShowBackButton: true,
-      title: find(state.posts, matchesProperty('id', id))?.title,
+      title: post?.title,
     };
   }
 })(App);

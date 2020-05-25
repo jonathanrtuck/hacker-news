@@ -5,10 +5,18 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
   switch (action.type) {
     case ActionType.ReadPost:
       switch (action.meta.status) {
+        case Status.Error:
+          return {
+            ...state,
+            isBusy: false,
+            isError: true,
+          };
+
         case Status.Request:
           return {
             ...state,
             isBusy: true,
+            isError: false,
             posts: [],
           };
 
@@ -16,7 +24,7 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
           return {
             ...state,
             isBusy: false,
-            posts: action.payload.posts,
+            posts: [action.payload.post],
           };
 
         default:
@@ -25,11 +33,19 @@ export default (state: State = INITIAL_STATE, action: Action): State => {
 
     case ActionType.ReadPosts:
       switch (action.meta.status) {
+        case Status.Error:
+          return {
+            ...state,
+            isBusy: false,
+            isError: true,
+          };
+
         case Status.Request:
           return {
             ...state,
             count: 0,
             isBusy: true,
+            isError: false,
             posts: [],
           };
 

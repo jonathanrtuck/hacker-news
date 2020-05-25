@@ -28,9 +28,9 @@ export interface Meta {
 
 export interface PostReadAction extends ReduxAction<ActionType> {
   meta: Meta;
-  payload: {
-    id: number;
-    posts?: Post[];
+  payload?: {
+    id?: number;
+    post?: Post;
   };
   type: ActionType.ReadPost;
 }
@@ -40,7 +40,7 @@ export interface PostsReadAction extends ReduxAction<ActionType> {
   payload?: {
     count?: number;
     page?: number;
-    posts?: Post[];
+    posts?: Partial<Post>[];
   };
   type: ActionType.ReadPosts;
 }
@@ -57,15 +57,56 @@ export type Action = PostReadAction | PostsReadAction | UrlUpdateAction;
 export type ThunkAction = ReduxThunkAction<void, State, ExtraArgument, Action>;
 export type ThunkDispatch = ReduxThunkDispatch<State, ExtraArgument, Action>;
 
-export const readPost = (id: number): PostReadAction => ({
-  meta: {
-    status: Status.Request,
-  },
-  payload: {
-    id,
-  },
-  type: ActionType.ReadPost,
-});
+export const readPost = (id: number): ThunkAction => (
+  dispatch: ThunkDispatch,
+  getState: () => State,
+  { api }: ExtraArgument
+): void => {
+  dispatch({
+    meta: {
+      status: Status.Request,
+    },
+    payload: {
+      id,
+    },
+    type: ActionType.ReadPost,
+  });
+
+  axios({
+    method: 'get',
+    url: `${api}/item/${id}.json`,
+  })
+    .then(property<unknown, unknown>('data'))
+    .then(({ by, id, kids, score, time, title, url }) => {
+      kids;
+
+      dispatch({
+        meta: {
+          status: Status.Success,
+        },
+        payload: {
+          post: {
+            comments: [],
+            createdAt: fromUnixTime(time),
+            createdBy: by,
+            id,
+            score,
+            title,
+            url,
+          },
+        },
+        type: ActionType.ReadPost,
+      });
+    })
+    .catch(() => {
+      dispatch({
+        meta: {
+          status: Status.Error,
+        },
+        type: ActionType.ReadPost,
+      });
+    });
+};
 
 export const readPosts = (page: number): ThunkAction => (
   dispatch: ThunkDispatch,
@@ -106,7 +147,7 @@ export const readPosts = (page: number): ThunkAction => (
     )
     .then(axios.all)
     .then((responses: unknown[]): void => {
-      const posts: Post[] = responses
+      const posts: Partial<Post>[] = responses
         .map(property('data'))
         .map(({ by, id, score, time, title }) => ({
           createdAt: fromUnixTime(time),
@@ -123,6 +164,14 @@ export const readPosts = (page: number): ThunkAction => (
         payload: {
           count,
           posts,
+        },
+        type: ActionType.ReadPosts,
+      });
+    })
+    .catch(() => {
+      dispatch({
+        meta: {
+          status: Status.Error,
         },
         type: ActionType.ReadPosts,
       });

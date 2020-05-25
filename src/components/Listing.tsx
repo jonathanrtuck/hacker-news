@@ -25,6 +25,7 @@ import { navigateTo } from 'utils/history';
 interface ListingProps {
   indexOffset: number;
   isBusy: boolean;
+  isError: boolean;
   isFirstPage: boolean;
   isLastPage: boolean;
   page: number;
@@ -35,6 +36,7 @@ interface ListingProps {
 export const Listing: FunctionComponent<ListingProps> = ({
   indexOffset,
   isBusy,
+  isError,
   isFirstPage,
   isLastPage,
   page,
@@ -47,6 +49,13 @@ export const Listing: FunctionComponent<ListingProps> = ({
 
   if (isBusy) {
     return <LinearProgress />;
+  }
+
+  if (isError) {
+    /**
+     * @todo
+     */
+    return <h1>error…</h1>;
   }
 
   return (
@@ -115,9 +124,10 @@ export const Listing: FunctionComponent<ListingProps> = ({
 };
 
 export default connect(
-  (state: State, { page }: any) => ({
+  (state: State, { page }: Partial<ListingProps>) => ({
     indexOffset: (page - 1) * state.perPage,
     isBusy: state.isBusy,
+    isError: state.isError,
     isFirstPage: page === 1,
     isLastPage: page === Math.ceil(state.count / state.perPage),
     posts: state.posts,
