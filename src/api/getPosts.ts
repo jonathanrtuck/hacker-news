@@ -8,7 +8,7 @@ const getPosts = async ({ first, offset }): Promise<Posts> => {
     method: 'get',
     url: `${API}/topstories.json`,
   });
-  const itemsSize: number = data.length;
+  const size: number = data.length;
   const ids: number[] = data.slice(offset, offset + first);
   const responses: AxiosResponse[] = await axios.all(
     ids.map((id) =>
@@ -32,7 +32,7 @@ const getPosts = async ({ first, offset }): Promise<Posts> => {
 
   return {
     items: posts,
-    size: itemsSize,
+    size,
   };
 };
 
