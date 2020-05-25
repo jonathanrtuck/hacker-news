@@ -1,10 +1,12 @@
 import { Location } from 'history';
 
 export interface Comment {
+  comments: Comment[];
+  content: string;
   createdAt: Date;
   createdBy: string;
   id: number;
-  //
+  isDeleted?: boolean;
 }
 
 export interface Post {

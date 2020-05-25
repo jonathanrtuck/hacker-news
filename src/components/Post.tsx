@@ -1,8 +1,8 @@
 import {
   LinearProgress,
   List,
+  makeStyles,
   Typography,
-  withStyles,
 } from '@material-ui/core';
 import Comment from 'components/Comment';
 import Subtitle from 'components/Subtitle';
@@ -10,6 +10,15 @@ import React, { FunctionComponent, ReactElement, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { readPost } from 'store/actions';
 import { Comment as CommentType, Post as PostType, State } from 'store/state';
+
+const useStyles = makeStyles((theme) => ({
+  comments: {
+    marginTop: theme.spacing(2),
+  },
+  root: {
+    padding: theme.spacing(2),
+  },
+}));
 
 interface PostProps {
   comments: CommentType[];
@@ -34,6 +43,8 @@ export const Post: FunctionComponent<PostProps> = ({
   score,
   url,
 }: PostProps): ReactElement => {
+  const classes = useStyles();
+
   useEffect(() => {
     readPost(id);
   }, [id]);
@@ -50,7 +61,7 @@ export const Post: FunctionComponent<PostProps> = ({
   }
 
   return (
-    <article>
+    <article className={classes.root}>
       <Typography component="a" href={url} variant="h6">
         {url}
       </Typography>
@@ -58,6 +69,7 @@ export const Post: FunctionComponent<PostProps> = ({
         <Subtitle createdAt={createdAt} createdBy={createdBy} score={score} />
       </Typography>
       <List
+        className={classes.comments}
         component="aside"
         subheader={
           <Typography component="h2" variant="srOnly">
@@ -66,8 +78,23 @@ export const Post: FunctionComponent<PostProps> = ({
         }
       >
         {comments.map(
-          ({ id }: CommentType): ReactElement => (
-            <Comment id={id} key={id} level={1} />
+          ({
+            comments,
+            content,
+            createdAt,
+            createdBy,
+            id,
+            isDeleted,
+          }: CommentType): ReactElement => (
+            <Comment
+              comments={comments}
+              content={content}
+              createdAt={createdAt}
+              createdBy={createdBy}
+              isDeleted={isDeleted}
+              key={id}
+              level={1}
+            />
           )
         )}
       </List>

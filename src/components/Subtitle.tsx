@@ -1,10 +1,10 @@
 import { formatDistanceToNow } from 'date-fns';
-import React, { FunctionComponent, ReactElement } from 'react';
+import React, { Fragment, FunctionComponent, ReactElement } from 'react';
 
 interface SubtitleProps {
   createdAt: Date;
   createdBy: string;
-  score: number;
+  score?: number;
 }
 
 export const Subtitle: FunctionComponent<SubtitleProps> = ({
@@ -12,10 +12,12 @@ export const Subtitle: FunctionComponent<SubtitleProps> = ({
   createdBy,
   score,
 }: SubtitleProps): ReactElement => (
-  <span>
-    {score} {score === 1 ? 'point' : 'points'} by {createdBy}{' '}
-    {createdAt && formatDistanceToNow(createdAt)}
-  </span>
+  <Fragment>
+    {Number.isInteger(score)
+      ? `${score} ${score === 1 ? 'point' : 'points'} `
+      : ''}
+    by {createdBy} {createdAt && formatDistanceToNow(createdAt)}
+  </Fragment>
 );
 
 export default Subtitle;

@@ -5,8 +5,8 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  makeStyles,
   Typography,
-  withStyles,
 } from '@material-ui/core';
 import { ChevronLeft, ChevronRight } from '@material-ui/icons';
 import Subtitle from 'components/Subtitle';
@@ -21,6 +21,16 @@ import { connect } from 'react-redux';
 import { readPosts } from 'store/actions';
 import { Post, State } from 'store/state';
 import { navigateTo } from 'utils/history';
+
+const useStyles = makeStyles((theme) => ({
+  arrow: {
+    margin: theme.spacing(1),
+  },
+  nav: {
+    display: 'flex',
+    justifyContent: 'center',
+  },
+}));
 
 interface ListingProps {
   indexOffset: number;
@@ -43,6 +53,8 @@ export const Listing: FunctionComponent<ListingProps> = ({
   posts,
   readPosts,
 }: ListingProps): ReactElement => {
+  const classes = useStyles();
+
   useEffect(() => {
     readPosts(page);
   }, [page]);
@@ -97,8 +109,9 @@ export const Listing: FunctionComponent<ListingProps> = ({
           </li>
         ))}
       </List>
-      <nav>
+      <nav className={classes.nav}>
         <IconButton
+          className={classes.arrow}
           disabled={isFirstPage}
           onClick={(): void => {
             navigateTo({
@@ -109,6 +122,7 @@ export const Listing: FunctionComponent<ListingProps> = ({
           <ChevronLeft />
         </IconButton>
         <IconButton
+          className={classes.arrow}
           disabled={isLastPage}
           onClick={(): void => {
             navigateTo({

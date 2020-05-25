@@ -7,7 +7,7 @@ import {
   ThunkDispatch as ReduxThunkDispatch,
 } from 'redux-thunk';
 import { ExtraArgument } from 'store/extra-argument';
-import { Post, State } from 'store/state';
+import { Comment, Post, State } from 'store/state';
 
 export enum ActionType {
   ReadPost = 'READ_POST',
@@ -61,6 +61,40 @@ export const readPost = (id: number): ThunkAction => async (
   getState: () => State,
   { api }: ExtraArgument
 ): Promise<void> => {
+  // recursive
+  const getComments = async (ids: number[]): Promise<Comment[]> => {
+    if (Array.isArray(ids) && ids.length !== 0) {
+      const responses: AxiosResponse[] = await axios.all(
+        ids.map((id) =>
+          axios({
+            method: 'get',
+            url: `${api}/item/${id}.json`,
+          })
+        )
+      );
+      const comments: Comment[] = await Promise.all(
+        responses
+          .map(({ data }) => data)
+          .map(async ({ by, deleted, id, kids, text, time }) => {
+            const comments: Comment[] = await getComments(kids);
+
+            return {
+              comments,
+              content: text,
+              createdAt: fromUnixTime(time),
+              createdBy: by,
+              id,
+              isDeleted: deleted,
+            };
+          })
+      );
+
+      return comments;
+    }
+
+    return [];
+  };
+
   dispatch({
     meta: {
       status: Status.Request,
@@ -78,6 +112,7 @@ export const readPost = (id: number): ThunkAction => async (
       method: 'get',
       url: `${api}/item/${id}.json`,
     });
+    const comments: Comment[] = await getComments(kids);
 
     dispatch({
       meta: {
@@ -85,7 +120,7 @@ export const readPost = (id: number): ThunkAction => async (
       },
       payload: {
         post: {
-          comments: [],
+          comments,
           createdAt: fromUnixTime(time),
           createdBy: by,
           id,
